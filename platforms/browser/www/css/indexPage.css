@@ -1,0 +1,23 @@
+.topbar{
+	
+	background-color:#ffffff;
+	height:54px;
+	
+	
+}
+
+.topbar_logo{
+	
+	text-align:center;
+	margin-right:36pt;
+	
+}
+
+canvas#hamMenu{
+	float:left;
+	height:42px;
+	width:42px;
+	cursor:pointer;
+	margin-top:5pt;
+	margin-left:4pt;
+}
