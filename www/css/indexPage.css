@@ -13,6 +13,13 @@
 	
 }
 
+.topbar_logo>img{
+	
+	width:auto;
+	height:auto;
+	
+}
+
 canvas#hamMenu{
 	float:left;
 	height:42px;
