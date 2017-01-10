@@ -1,23 +1,27 @@
 .topbar{
 	
 	background-color:#ffffff;
-	height:54px;
+	height:48px;
+	margin-top:6pt;
 	
 	
 }
+
 
 .topbar_logo{
 	
 	text-align:center;
 	margin-right:36pt;
-	
 }
 
-.topbar_logo>img{
+
+
+
+.topbar_logo a{
 	
-	width:auto;
-	height:auto;
-	
+	font-size:30px;
+	font-family:upbus;
+
 }
 
 canvas#hamMenu{
@@ -25,6 +29,5 @@ canvas#hamMenu{
 	height:42px;
 	width:42px;
 	cursor:pointer;
-	margin-top:5pt;
 	margin-left:4pt;
 }
