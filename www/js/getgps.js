@@ -148,7 +148,11 @@
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 50.791499, lng: -1.0815219},
               zoom: 14,
-			  gestureHandling: 'greedy'
+			  gestureHandling: 'greedy',
+			  mapTypeControl: false,
+			  zoomControl:false,
+			  streetViewControl:false,
+			  fullscreenControl: false,
             });
 			
 			//Init marker name 设置标记名弹窗变量

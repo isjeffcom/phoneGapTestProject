@@ -12,14 +12,14 @@
           // 获取位置信息成功时调用的回调函数
           function onSuccess(position) {
             var element = document.getElementById('geolocation');
-            element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
+            /*element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
                       'Longitude: '          + position.coords.longitude             + '<br />' +
                       'Altitude: '           + position.coords.altitude              + '<br />' +
                       'Accuracy: '           + position.coords.accuracy              + '<br />' +
                       'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
                       'Heading: '            + position.coords.heading               + '<br />' +
                       'Speed: '              + position.coords.speed                 + '<br />' +
-                      'Timestamp: '          + new Date(position.timestamp)          + '<br />';
+                      'Timestamp: '          + new Date(position.timestamp)          + '<br />';*/
 
             // alert('Position return successful');
             console.log('Position return successful');
@@ -148,6 +148,11 @@
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 50.791499, lng: -1.0815219},
               zoom: 14,
+			  gestureHandling: 'greedy',
+			  mapTypeControl: false,
+			  zoomControl:false,
+			  streetViewControl:false,
+			  fullscreenControl: false,
             });
 			
 			//Init marker name 设置标记名弹窗变量
