@@ -200,4 +200,4 @@
 			
 			console.log('initMap');
 
-          }
+        }

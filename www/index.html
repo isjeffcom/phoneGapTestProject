@@ -23,28 +23,28 @@
 	<link rel="stylesheet" type="text/css" href="css/indexPage.css" />
     <title>Hello World</title>
     <style type="text/css">
-	
+
 		@font-face {
 			font-family:upbus;
 			src:url(./asset/font/upbusFont.ttf);
 		}
-		
+
     </style>
 	<script type="text/javascript" src="./js/hamMenu.js"></script>
 	<script type="text/javascript">
-	
+
 		window.onload = function(){
 				var canvas = document.getElementById("hamMenu"); //get canvas
 				var icon = whooper.create(canvas);             //create whooper instance
 				icon.color = "#333333";                       //change color (default is white)
 				icon.set(0);                                 //draw frame No 0
-				
+
 				//add click listener to the canvas
 				canvas.addEventListener("click", function(){ icon.rotate(300) });
-				
+
 		};
 	</script>
-	
+
 </head>
 
 <body>
@@ -52,7 +52,13 @@
 			<canvas id="hamMenu" height="150" width="150"></canvas>
 			<div class='topbar_logo'><!--img src='./asset/img/topBarLogo.png'/--><a>UBUS</a></div>
 		</div>
-		
+
+    <div class='footbar'>
+      <p id='nearest'>Nearest Station</p>
+      <p id='next'></p>
+
+    </div>
+
 
 
         <!--Google Maps Initialize-->
@@ -64,12 +70,16 @@
 
         <!--Google Maps End-->
 
+
+
+
+
 		<script type="text/javascript" src="cordova.js"></script>
 		<script type="text/javascript" src="js/index.js"></script>
 		<script type="text/javascript">
 			app.initialize();
 		</script>
-		
+
 </body>
 
 </html>

@@ -1,3 +1,16 @@
+/*
+  created by Jeff
+  Co-with Liam
+
+  Bug waitting for fixed:
+  1.bus return time problem;
+  2.when minute = 01, only can get 1
+  3.unable to use timeout 
+
+
+*/
+
+
           // 等待加载PhoneGap
           document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -38,10 +51,10 @@
           }
 
           var map;
-		  
+
 		  //初始化地图
           function initMap() {
-			
+
 			//Set up markers 设置标记
 			/*var stop1 = {lat: 50.796784, lng: -1.041907};
 			var stop2 = {lat: 50.7940405, lng: -1.0552931};
@@ -49,7 +62,7 @@
 			var stop4 = {lat: 50.7958546, lng: -1.075254};
 			var stop5 = {lat: 50.7955254, lng:-1.0931081};
 			var stop6 = {lat: 50.7950578, lng:-1.0954583};*/
-			
+
 			//Set Marker's LatLng 设置标记点
 			var locations = [
 				['Langstone Campus', 50.796784, -1.041907, 4],
@@ -59,12 +72,7 @@
 				['Winston Churchill Ave', 50.795470, -1.092348,4],
 				['Cambridge Road', 50.794527, -1.096987,4],
 			];
-			
-			var nline = [
-				['Langstone Campus', 50.796784, -1.041907, 1],
-				['Locksway Road', 50.796795, -1.042146, 2],
-			];
-			
+
 			var lineLocations = [
 				//Langstone - Locksway
 				{lat: 50.796784, lng: -1.041907},
@@ -140,11 +148,11 @@
 				{lat: 50.795698, lng: -1.093895},
 				{lat: 50.795563, lng: -1.093272},
 				{lat: 50.795470, lng: -1.092348},
-				
-				
+
+
 			];
-			
-			//Set basic attributes 
+
+			//Set basic attributes
             map = new google.maps.Map(document.getElementById('map'), {
               center: {lat: 50.791499, lng: -1.0815219},
               zoom: 14,
@@ -154,15 +162,15 @@
 			  streetViewControl:false,
 			  fullscreenControl: false,
             });
-			
+
 			//Init marker name 设置标记名弹窗变量
 			var infowindow = new google.maps.InfoWindow();
-			
+
 			//Init marker and Counter var
 			var marker, i;
-			
+
 			var stopImage = './asset/img/stopMarker.png';
-			
+
 			//Set a loop to spawn markers 根据位置数量循环加载标记点
 			for (i = 0; i < locations.length; i++){
 				marker = new google.maps.Marker({
@@ -171,8 +179,8 @@
 					icon: stopImage,
 					map:map
 				});
-				
-				//set up cilck event to display infoWindow & name 
+
+				//set up cilck event to display infoWindow & name
 				google.maps.event.addListener(marker, 'click', (function(marker, i) {
 					return function() {
 					  infowindow.setContent(locations[i][0]);
@@ -180,12 +188,12 @@
 					}
 				})(marker,i));
 			}
-			
+
 			/*uniBus_Current = new google.mpas.Marker({
 				position: if()
 			});*/
-			
-			//绘制路线
+
+			//Draw Line 绘制路线
 			var unibusLine = new google.maps.Polyline({
 				path: lineLocations,
 				geodesic: true,
@@ -193,11 +201,196 @@
 				strokeOpacity:1.0,
 				strokeWeight: 9
 			});
-			
+
 			marker.setMap(map);
 			unibusLine.setMap(map);
 			console.log('set marker');
-			
+
 			console.log('initMap');
 
-          }
+
+        }
+
+
+	//Station Calculate
+  //get realtime
+  var currentTime;
+  function timeRefresh(){
+    var d = new Date();
+    var hours = d.getHours();
+    var minute = d.getMinutes();
+
+    console.log(minute);
+    currentTime = parseInt(hours.toString()+minute);
+    return currentTime;
+  }
+  //timeRefresh();
+  setTimeout(timeRefresh(), 60000);
+  console.log(currentTime);
+
+	var currentStation;
+	var nextStation;
+	var stopStation;
+  var nextInfo;
+  var nextMin;
+  var userCStation = 5;
+	var currentMinute = getMin(currentTime);
+	var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840, 1900]; //Bus1 Start time Each
+	var busStation=['Langstone Campus', 'Locks Way Road','Goldsmith Avenue (Lidi)','Goldsmith Avenue (Milton Park)', 'Fratton Railway Station', 'Winston Churchill Ave', 'Cambridge Road'];
+	var possTime = [00,03,05,07,08,09,10,13,14,15,20,23,25,27,28,29,30,33,34,35,40,43,45,47,48,49,50,53,55,57];
+
+	function getMin(time){
+		var time;
+		sTime = time.toString();
+		sMinOut = sTime.substr(sTime.length-2);
+		minOut = parseInt(sMinOut);
+		var currentMinute = minOut;
+		return currentMinute;
+	}
+
+	function toEnd(prev){
+
+		var prev;
+		var prevMin = getMin(prev);
+		endTime = prev + 37;
+		if(getMin(endTime) >= 60){
+			endTime = (endTime + 100) - 60;
+		}
+		return endTime;
+
+	}
+
+
+	function checkStation(time){
+
+		var time;
+		var timeMin = currentMinute;
+
+		for(i=0; i<t1.length; i++){
+			if(time >= t1[i] && time <= toEnd(t1[i])){
+				findStation(timeMin);
+				stopStation = currentStation;
+				console.log('Get Station Successful')
+				}
+
+			}
+			return stopStation;
+		}
+
+		function findStation(ts){
+			var ts;
+			switch (ts){
+				case 00: case 20: case 40: case 55: case 15: case 35:
+				for(i = 0; i<t1.length; i++){
+					if(currentTime != t1[i]){
+						cSN = 6;
+						currentStation = busStation[currentStation];
+						break;
+					}else{
+						cSN = 0;
+						currentStation = busStation[currentStation];
+						break;
+					}
+				}
+
+					case 57: case 17: case 37:
+					cSN = 0;
+					currentStation = busStation[cSN];
+					break;
+
+					case 43: case 03: case 23:
+					cSN = 1;
+					currentStation = busStation[cSN];
+					break;
+
+					case 47: case 07: case 27: case 10: case 30: case 50:
+					cSN = 2;
+					currentStation = busStation[cSN];
+					break;
+
+					case 14: case 34: case 54:
+					cSN = 2;
+					currentStation = busStation[cSN];
+					break;
+
+					case 49: case 09: case 29: case 08: case 28: case 48:
+					cSN = 4;
+					currentStation = busStation[cSN];
+					break;
+
+					case 53: case 13: case 33: case 05: case 25: case 45:
+					cSN = 5;
+					currentStation = busStation[cSN];
+					break;
+
+					default:
+					currentStation = "enroute";
+					break;
+
+
+			}
+			return currentStation;
+		}
+
+
+		function checkPosition(timeNow){
+			var timeNow;
+			var minNow = getMin(timeNow);
+			var cal;
+			for(i=0; i<possTime.length; i++){
+				cal = minNow - possTime[i];
+				if(cal < 0){
+					break;
+				}
+			}
+
+			nST = possTime[i+1];
+			nextStation = findStation(nST);
+			return [nextStation, nST];
+		}
+
+    function nextTime(nSTn){
+      var nSTn = nST;
+      if(currentMinute<nSTn){
+        nextMin = nSTn - currentMinute;
+      }
+
+      if(currentMinute>nSTn){
+        var num = possTime.lastIndexOf(nSTn)
+        nextMin = possTime[num+1];
+      }
+
+      if(currentMinute == nSTn){
+        nextMin = 0;
+      }
+
+      returnMin = nextMin + 32;
+
+      return [nextMin,returnMin];
+    }
+
+    function main(){
+  		if(currentTime<740 && currentTime > 1900){
+  			busStatus = 0;
+  			console.log('Not in service')
+  		}else{
+  			checkPosition(currentTime);
+  			checkStation(currentTime);
+        nextTime(nST);
+        var nextbus = document.getElementById('next');
+  			if( stopStation != 'enroute'){
+  				busStatus = 1;
+          v = 'Bus now stop at: ' + stopStation + '. Next station is: ' + nextStation + nextMin + 'min';
+          nextbus.innerHTML = v;
+  				console.log(v);
+  			}else{
+  				busStatus = 10;
+          v = 'Enroute: ' + '. Next station is: ' + nextStation + ' <br>To Library: ' + nextMin + 'min';
+          nextbus.innerHTML = v;
+          console.log('nextMin: '+nextMin);
+  				console.log('Bus now enroute: ' + '. Next station is: ' + nextStation);
+  			}
+  		}
+    }
+    //main();
+    setTimeout(main(), 60000);
