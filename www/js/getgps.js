@@ -5,7 +5,7 @@
   Bug waitting for fixed:
   1.bus return time problem;
   2.when minute = 01, only can get 1
-  3.unable to use timeout 
+  3.unable to use timeout
 
 
 */
@@ -35,10 +35,10 @@
                       'Timestamp: '          + new Date(position.timestamp)          + '<br />';*/
 
             // alert('Position return successful');
-            console.log('Position return successful');
+
             var latitude = position.coords.latitude;
             var longitude = position.coords.longitude;
-            console.log('lat:', latitude, 'long:', longitude);
+
 
             //    Google Maps API set center:
             map.setCenter({ lat: latitude, lng: longitude});
@@ -67,7 +67,8 @@
 			var locations = [
 				['Langstone Campus', 50.796784, -1.041907, 4],
 				['Locksway Road', 50.793440, -1.056964,4],
-				['Goldsmith Avenue', 50.794917, -1.069517,4],
+				['Goldsmith Avenue (Lidi)', 50.794917, -1.069517,4],
+        ['Goldsmith Avenue (Milton Park)', 50.792572, -1.058592,4],
 				['Fratton Railway Station', 50.796025, -1.075952,4],
 				['Winston Churchill Ave', 50.795470, -1.092348,4],
 				['Cambridge Road', 50.794527, -1.096987,4],
@@ -204,40 +205,51 @@
 
 			marker.setMap(map);
 			unibusLine.setMap(map);
-			console.log('set marker');
 
-			console.log('initMap');
 
 
         }
 
 
-	//Station Calculate
-  //get realtime
-  var currentTime;
+	//Bus realtime location and user location-base timer Calculator (BL/ULBT)
+
+  var uCS = 3; //user current station
+
+  //To get current time
   function timeRefresh(){
     var d = new Date();
-    var hours = d.getHours();
-    var minute = d.getMinutes();
-
-    console.log(minute);
-    currentTime = parseInt(hours.toString()+minute);
+    var hours = d.getHours().toString();
+    var minute = d.getMinutes().toString();
+    hours = (minute.length = 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
+    currentTime = parseInt(hours+minute);
+    //currentTime = 1934; // 4 debug
     return currentTime;
+    console.log('c' + currentTime);
   }
-  //timeRefresh();
-  setTimeout(timeRefresh(), 60000);
-  console.log(currentTime);
 
-	var currentStation;
-	var nextStation;
-	var stopStation;
-  var nextInfo;
-  var nextMin;
-  var userCStation = 5;
-	var currentMinute = getMin(currentTime);
-	var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840, 1900]; //Bus1 Start time Each
-	var busStation=['Langstone Campus', 'Locks Way Road','Goldsmith Avenue (Lidi)','Goldsmith Avenue (Milton Park)', 'Fratton Railway Station', 'Winston Churchill Ave', 'Cambridge Road'];
-	var possTime = [00,03,05,07,08,09,10,13,14,15,20,23,25,27,28,29,30,33,34,35,40,43,45,47,48,49,50,53,55,57];
+
+  //NextStation and StopStation var
+	var B1nextStation;
+  var B2nextStation;
+	var B1stopStation;
+  var B2stopStation;
+  var nextStation;
+  var stopStation;
+
+  //Next Minute var
+  var B1nextMin;
+  var B2nextMin;
+  var left2CamTime;
+  var left2LanTime;
+  var left2CamTimeB2;
+  var left2LanTimeB2;
+
+  //Bus basic information
+	var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900]; //Bus1 Start time Each
+  var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
+  var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
+	var busStation=['Langstone Campus', 'Locks Way Road(Milton)','Goldsmith Avenue (Lidi)', 'Fratton Railway Station', 'Winston Churchill Ave (Ibis Hotel)', 'Cambridge Road(Student Union)', 'Cambridge Road(Spinnaker Sports)', 'Winston Churchill Ave (Law Courts)', 'Fratton Railway Station', 'Goldsmith Avenue (Lidl)', 'Goldsmith Avenue (Milton Park)', 'Langstone Campus'];
+
 
 	function getMin(time){
 		var time;
@@ -247,6 +259,31 @@
 		var currentMinute = minOut;
 		return currentMinute;
 	}
+
+  function getHour(htime){
+		var htime;
+		sTime = htime.toString();
+    sHourOut = (sTime < 1000) ? sTime.substr(0,1) : sTime.substr(0,2);
+		//sHourOut = sTime.substr(0,2);
+		HourOut = parseInt(sHourOut);
+		var currentHour = HourOut;
+		return currentHour;
+	}
+
+  function timeMinus(mTimeA, mTimeB){
+
+    var mTimeA;
+    var mTimeB;
+    var result = (getHour(mTimeA) == getHour(mTimeB)) ? mTimeA - mTimeB : (mTimeA - mTimeB) - 40;
+    return result;
+
+  }
+
+  function timeAddFix(ct){
+    var ct;
+    rt = ((getMin(ct) > 60) ? (ct + 100) - 60 : ct);
+    return rt;
+  }
 
 	function toEnd(prev){
 
@@ -260,137 +297,279 @@
 
 	}
 
-
 	function checkStation(time){
 
 		var time;
-		var timeMin = currentMinute;
+		var timeMin = getMin(currentTime);
 
+    //BUS1
 		for(i=0; i<t1.length; i++){
-			if(time >= t1[i] && time <= toEnd(t1[i])){
-				findStation(timeMin);
-				stopStation = currentStation;
-				console.log('Get Station Successful')
-				}
+
+        if(time <= t1[i] && time >= toEnd(t1[i-1])){
+          B1stopStation = busStation[0];
+          B1nextStation = busStation[1];
+          break;
+        }
+
+  			if(time > t1[i] && time < toEnd(t1[i])){
+
+
+          findStation(t1[i]);
+  				B1stopStation = stopStation;
+          B1nextStation = nextStation;
+          break;
+        }
 
 			}
-			return stopStation;
-		}
 
-		function findStation(ts){
-			var ts;
-			switch (ts){
-				case 00: case 20: case 40: case 55: case 15: case 35:
-				for(i = 0; i<t1.length; i++){
-					if(currentTime != t1[i]){
-						cSN = 6;
-						currentStation = busStation[currentStation];
-						break;
-					}else{
-						cSN = 0;
-						currentStation = busStation[currentStation];
-						break;
-					}
-				}
+    //BUS2
 
-					case 57: case 17: case 37:
-					cSN = 0;
-					currentStation = busStation[cSN];
-					break;
+    for(i = 0; i<t2.length;i++){
 
-					case 43: case 03: case 23:
-					cSN = 1;
-					currentStation = busStation[cSN];
-					break;
-
-					case 47: case 07: case 27: case 10: case 30: case 50:
-					cSN = 2;
-					currentStation = busStation[cSN];
-					break;
-
-					case 14: case 34: case 54:
-					cSN = 2;
-					currentStation = busStation[cSN];
-					break;
-
-					case 49: case 09: case 29: case 08: case 28: case 48:
-					cSN = 4;
-					currentStation = busStation[cSN];
-					break;
-
-					case 53: case 13: case 33: case 05: case 25: case 45:
-					cSN = 5;
-					currentStation = busStation[cSN];
-					break;
-
-					default:
-					currentStation = "enroute";
-					break;
-
-
-			}
-			return currentStation;
-		}
-
-
-		function checkPosition(timeNow){
-			var timeNow;
-			var minNow = getMin(timeNow);
-			var cal;
-			for(i=0; i<possTime.length; i++){
-				cal = minNow - possTime[i];
-				if(cal < 0){
-					break;
-				}
-			}
-
-			nST = possTime[i+1];
-			nextStation = findStation(nST);
-			return [nextStation, nST];
-		}
-
-    function nextTime(nSTn){
-      var nSTn = nST;
-      if(currentMinute<nSTn){
-        nextMin = nSTn - currentMinute;
+      //if the time is after the final bus2 then there are no bus2 anymore
+      var lastBus2 = t2[t2.length-1]
+      if(time > toEnd(lastBus2)){
+        B2stopStation = 99;
+        B2nextStation = 99;
       }
 
-      if(currentMinute>nSTn){
-        var num = possTime.lastIndexOf(nSTn)
-        nextMin = possTime[num+1];
+      //if time is out of the session range that mean is bus break time
+      if(time <= t2[i] && time >= toEnd(t2[i-1])){
+        B2stopStation = busStation[0];
+        B2nextStation = busStation[1];
+        break;
       }
 
-      if(currentMinute == nSTn){
-        nextMin = 0;
+      //Time is on a session and its able to find the stopStation and nextStation
+      if(time > t2[i] && time < toEnd(t2[i])){
+        findStation(t2[i]);
+        B2stopStation = stopStation;
+        B2nextStation = nextStation;
+        break;
       }
 
-      returnMin = nextMin + 32;
 
-      return [nextMin,returnMin];
     }
+
+			return [B1stopStation, B1nextStation, B2stopStation, B2nextStation];
+	}
+
+    //A function for find next station by bus start time.
+    function findStation(ts){
+
+      //ts = t[i] ts为起驶时间 ts is the start time
+      var ts;
+      var cS = ts;
+      var cT = currentTime;
+
+      for(i=0; i<stationGap.length;i++){
+        cS = timeAddFix(cS + stationGap[i]);
+        var cal = cT - cS;
+
+        if(cal < 0){
+          nextStation = ((i == 0) ? busStation[0] : busStation[i+1]);
+          stopStation = 0;
+          break;
+        }
+
+        if(cal == 0){
+          nextStation = ((i+1 <= 12) ? busStation[i+2] : busStation[0]);
+          stopStation = ((i == 0) ? busStation[i+1] : busStation[i+1]);
+          break;
+        }
+      }
+
+      return [nextStation, stopStation];
+    }
+
+
+    function nextMinByUcs(uCS){
+      var uCS; //User Station
+      var time = currentTime;
+
+      for(i = 0; i<t1.length;i++){
+
+          //if bus is in the last session
+          if(typeof t2[i] == 'undefined'){
+            LltS = t1[i];
+            LltSx = t1[i];
+            nUCSS = 11-uCS;
+
+            for(s=0; s<uCS;s++){LltS = timeAddFix(LltS + stationGap[s]);}
+            for(s=0; s<nUCSS;s++){LltSx = timeAddFix(LltSx + stationGap[s]);}
+
+            lTcalS = timeMinus(LltS, currentTime);
+            lTcalSx = timeMinus(LltSx, currentTime);
+
+            left2CamTime = (lTcalS>0) ? lTcalS : 777;
+            left2LanTime = (lTcalSx>0) ? lTcalSx : 777;
+
+            left2CamTimeB2 = 99;
+            left2LanTimeB2 = 99;
+            break;
+          }
+
+          //Bus1
+
+          if(time > t1[i] && time < toEnd(t1[i])){ //Get Session
+
+
+            var NstationTime = t1[i]; //Get Start Time
+
+            for(c=0; c<uCS;c++){NstationTime = timeAddFix(NstationTime + stationGap[c]);} //Add to the next time the bus about to stop
+
+            //Departure
+            if (time < t2[i]){ // If time < return start time which equal to bus2 depart start time
+              var Llt = t1[i]; //Llt == start returned bus arriving time
+              var Lltx = t2[i]; //Lltx == start departure bus arriving time
+               //minus and return the result to check if user still can catch the bus
+              nUCS = 11-uCS; //Opposite same station in one round.
+
+              for(d=0; d<nUCS;d++){Llt = timeAddFix(Llt + stationGap[d]);} //Llt == calculate returned bus arriving time
+              for(e=0; e<uCS;e++){Lltx = timeAddFix(Lltx + stationGap[e]);} //Lltx == calcute departure bus arriving time
+
+              lTcal = timeMinus(NstationTime, currentTime);
+              left2CamTime = (lTcal>0) ? lTcal : timeMinus(Lltx, currentTime);
+              left2LanTime = timeMinus(Llt, currentTime);
+              break;
+            }
+
+
+
+            //Return
+            if (time > t2[i]){ // Don't change, t2 is right !!!
+              var Llt = t2[i];
+              var Lltx = t2[i];
+              nUCS = 11-uCS;
+
+              for(d=0; d<nUCS;d++){Llt = timeAddFix(Llt + stationGap[d]);}
+              for(e=0; e<uCS;e++){Lltx = timeAddFix(Lltx + stationGap[e]);}
+
+
+              lTcal = timeMinus(Llt, currentTime);
+              left2LanTime = (lTcal>0) ? lTcal : timeMinus(Llt, currentTime);
+              left2CamTime = timeMinus(Lltx, currentTime);
+              break;
+            }
+
+            //TEST successful
+
+          }
+        }
+
+      //BUS2
+      for(i = 0; i<t2.length;i++){
+
+
+              if(time > t2[i] && time < toEnd(t2[i])){
+
+                if(typeof t2[i] == 'undefined'){    //if bus is in the last session
+
+                  left2CamTimeB2 = 99;
+                  left2LanTimeB2 = 99;
+                  break;
+                }
+
+                var NstationTimeB2 = t2[i];
+                for(c=0; c<uCS;c++){NstationTimeB2 = timeAddFix(NstationTimeB2 + stationGap[c]);}
+
+                if (time < t1[i+1]){ // Don't change, t is right !!!
+
+                  var LltB2 = t2[i]; //Llt == start returned bus arriving time
+                  var LltxB2 = t1[i+1]; //Lltx == start departure bus arriving time
+                   //minus and return the result to check if user still can catch the bus
+                  nUCSB2 = 11-uCS; //Opposite same station in one round.
+
+
+                  for(d=0; d<nUCSB2;d++){LltB2 = timeAddFix(LltB2 + stationGap[d]);} //Llt == calculate returned bus arriving time
+                  for(e=0; e<uCS;e++){LltxB2 = timeAddFix(LltxB2 + stationGap[e]);} //Lltx == calcute departure bus arriving time
+
+                  lTcalB2 = timeMinus(NstationTimeB2, currentTime);
+                  left2CamTimeB2 = (lTcalB2>0) ? lTcal : timeMinus(LltxB2, currentTime);
+                  left2LanTimeB2 = timeMinus(LltB2, currentTime);
+                  break;
+
+                }
+
+                if (time > t1[i+1]){ // Don't change, t is right !!!
+
+                  var LltB2 = t2[i];
+                  var LltxB2 = t1[i+1];
+                  nUCSB2 = 11-uCS;
+
+                  for(d=0; d<nUCSB2;d++){LltB2 = timeAddFix(LltB2 + stationGap[d]);}
+                  for(e=0; e<uCS;e++){LltxB2 = timeAddFix(LltxB2 + stationGap[e]);}
+
+
+                  lTcalB2 = timeMinus(LltB2, currentTime);
+                  left2LanTimeB2 = (lTcalB2>0) ? lTcalB2 : timeMinus(LltB2, currentTime);
+                  left2CamTimeB2 = timeMinus(LltxB2, currentTime);
+                  break;
+                }
+
+              }
+      }
+
+
+      //Fix a problem that if the time is out of the session that this function could return a undefined value cause uncountable final result.
+      left2CamTime = (typeof left2CamTime == 'undefined') ? 99 : left2CamTime;
+      left2CamTimeB2 = (typeof left2CamTimeB2 == 'undefined') ? 99 : left2CamTime;
+      left2LanTime = (typeof left2LanTime == 'undefined') ? 99 : left2LanTime;
+      left2LanTimeB2 = (typeof left2LanTimeB2 == 'undefined') ? 99 : left2LanTimeB2;
+
+      //Identify which bus is more approach to the user station and give a final return. 2017.01.16
+      if(left2CamTime < 0 || left2CamTimeB2 < 0){
+        leftCamTime = (left2CamTime > left2CamTimeB2) ? left2CamTime : left2CamTimeB2;
+      }else{
+        leftCamTime = (left2CamTime < left2CamTimeB2) ? left2CamTime : left2CamTimeB2;
+      }
+
+      if(left2LanTime < 0 || left2LanTimeB2 < 0){
+        leftLanTime = (left2LanTime > left2LanTimeB2) ? left2LanTime : left2LanTimeB2;
+      }else{
+        leftLanTime = (left2LanTime < left2LanTimeB2) ? left2LanTime : left2LanTimeB2;
+      }
+
+      return [left2LanTime, left2CamTime, left2CamTimeB2, left2LanTimeB2, leftCamTime, leftLanTime];
+
+      //B1nextStation =
+
+    }
+
+
+
+
+
+
 
     function main(){
-  		if(currentTime<740 && currentTime > 1900){
-  			busStatus = 0;
-  			console.log('Not in service')
+      timeRefresh();
+      var nextbus = document.getElementById('next');
+      var nextbus2 = document.getElementById('next2');
+      var nearest = document.getElementById('nearest');
+  		if(currentTime<740 || currentTime >= 1937){
+
+  			bus1Status = 0;
+        bus2Status = 0;
+        v = 'University Bus not in services';
+        nextbus.innerHTML = v;
+        //nextbus2.innerHTML = c;
+
   		}else{
-  			checkPosition(currentTime);
+        nextMinByUcs(uCS);
   			checkStation(currentTime);
-        nextTime(nST);
-        var nextbus = document.getElementById('next');
-  			if( stopStation != 'enroute'){
-  				busStatus = 1;
-          v = 'Bus now stop at: ' + stopStation + '. Next station is: ' + nextStation + nextMin + 'min';
-          nextbus.innerHTML = v;
-  				console.log(v);
-  			}else{
-  				busStatus = 10;
-          v = 'Enroute: ' + '. Next station is: ' + nextStation + ' <br>To Library: ' + nextMin + 'min';
-          nextbus.innerHTML = v;
-          console.log('nextMin: '+nextMin);
-  				console.log('Bus now enroute: ' + '. Next station is: ' + nextStation);
-  			}
-  		}
+        v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
+        k = 'To libray: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
+        s = busStation[uCS];
+        nearest.innerHTML = s;
+        nextbus.innerHTML = v;
+        nextbus2.innerHTML = k;
+        //console.log('B1 cam: ' + left2CamTime + ' B1 Lan:' + left2LanTime + ' B2 cam: ' + left2CamTimeB2 + ' B2 Lan: ' + left2LanTimeB2);
+        //console.log('Final LeftCamTime: ' + leftCamTime + ' LeftLanTime: ' + leftLanTime);
     }
+  }
+  main();
+  window.setInterval(main, 20000);
+
     //main();
-    setTimeout(main(), 60000);
+    //setTimeout(main(), 6000);
