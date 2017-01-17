@@ -221,8 +221,8 @@
     var hours = d.getHours().toString();
     var minute = d.getMinutes().toString();
     hours = (minute.length = 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
-    currentTime = parseInt(hours+minute);
-    //currentTime = 1934; // 4 debug
+    //currentTime = parseInt(hours+minute);
+    currentTime = 811; // 4 debug
     return currentTime;
     console.log('c' + currentTime);
   }
@@ -305,6 +305,7 @@
     //BUS1
 		for(i=0; i<t1.length; i++){
 
+        //if time is out of the session range that mean is bus break time
         if(time <= t1[i] && time >= toEnd(t1[i-1])){
           B1stopStation = busStation[0];
           B1nextStation = busStation[1];
@@ -390,7 +391,8 @@
       for(i = 0; i<t1.length;i++){
 
           //if bus is in the last session
-          if(typeof t2[i] == 'undefined'){
+          if(i > t1.length-1 && typeof t2[i] == 'undefined'){
+
             LltS = t1[i];
             LltSx = t1[i];
             nUCSS = 11-uCS;
@@ -406,6 +408,7 @@
 
             left2CamTimeB2 = 99;
             left2LanTimeB2 = 99;
+
             break;
           }
 
@@ -432,6 +435,7 @@
               left2CamTime = (lTcal>0) ? lTcal : timeMinus(Lltx, currentTime);
               left2LanTime = timeMinus(Llt, currentTime);
               break;
+
             }
 
 
@@ -449,6 +453,7 @@
               lTcal = timeMinus(Llt, currentTime);
               left2LanTime = (lTcal>0) ? lTcal : timeMinus(Llt, currentTime);
               left2CamTime = timeMinus(Lltx, currentTime);
+
               break;
             }
 
@@ -462,7 +467,6 @@
 
 
               if(time > t2[i] && time < toEnd(t2[i])){
-
                 if(typeof t2[i] == 'undefined'){    //if bus is in the last session
 
                   left2CamTimeB2 = 99;
@@ -504,6 +508,7 @@
                   lTcalB2 = timeMinus(LltB2, currentTime);
                   left2LanTimeB2 = (lTcalB2>0) ? lTcalB2 : timeMinus(LltB2, currentTime);
                   left2CamTimeB2 = timeMinus(LltxB2, currentTime);
+
                   break;
                 }
 
@@ -512,16 +517,19 @@
 
 
       //Fix a problem that if the time is out of the session that this function could return a undefined value cause uncountable final result.
+
       left2CamTime = (typeof left2CamTime == 'undefined') ? 99 : left2CamTime;
-      left2CamTimeB2 = (typeof left2CamTimeB2 == 'undefined') ? 99 : left2CamTime;
+      left2CamTimeB2 = (typeof left2CamTimeB2 == 'undefined') ? 99 : left2CamTimeB2;
       left2LanTime = (typeof left2LanTime == 'undefined') ? 99 : left2LanTime;
       left2LanTimeB2 = (typeof left2LanTimeB2 == 'undefined') ? 99 : left2LanTimeB2;
 
       //Identify which bus is more approach to the user station and give a final return. 2017.01.16
       if(left2CamTime < 0 || left2CamTimeB2 < 0){
         leftCamTime = (left2CamTime > left2CamTimeB2) ? left2CamTime : left2CamTimeB2;
+
       }else{
         leftCamTime = (left2CamTime < left2CamTimeB2) ? left2CamTime : left2CamTimeB2;
+
       }
 
       if(left2LanTime < 0 || left2LanTimeB2 < 0){
