@@ -50,206 +50,285 @@
               'message: ' + error.message + '\n');
           }
 
-          var map;
+          /*
+          Return Var:
+          uCS = User Current Station Number
+          busStation[uCS] = User Current Station name
+
+          ^Base on Bus location
+          B1stopStation = Bus 1 Currently Stop Station
+          B2stopStation = Bus 2 Currently Stop Station
+          B1nextStation = Bus 1 Next Stop Station
+          B2nextStation = Bus2 Next Stop Station
+
+          ^Base on User Location
+          leftCamTime = Next bus time to Cambridge Road (Library)
+          leftLanTime = Next bus time to Langstone (Student Village)
+          left2CamTime = Bus 1 next time to Cambridge Road
+          left2CamTimeB2 = Bus 2 next time to Cambridge Road
+          left2LanTime = Bus 1 next time to Langstone
+          left2LanTimeB2 Bus 2 next time to Langstone
+          */
+
+        var map;
+
+        //To get current time
+        function timeRefresh(){
+          var d = new Date();
+          var hours = d.getHours().toString();
+          var minute = d.getMinutes().toString();
+          hours = (minute.length == 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
+          currentTime = parseInt(hours+minute);
+          //currentTime = 1202; // 4 debug
+          return currentTime;
+
+        }
+
+        //NextStation and StopStation var
+        var B1nextStation;
+        var B2nextStation;
+        var B1stopStation;
+        var B2stopStation;
+        var nextStation;
+        var stopStation;
+
+        //Next Minute var
+        var B1nextMin;
+        var B2nextMin;
+        var left2CamTime;
+        var left2LanTime;
+        var left2CamTimeB2;
+        var left2LanTimeB2;
+
+        var uCS = 3; //user current station
+
+        //Bus basic information
+        var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900]; //Bus1 Start time Each
+        var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
+        var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
+        var busStation=['Langstone Campus', 'Locks Way Road(Milton)','Goldsmith Avenue (Lidi)', 'Fratton Railway Station', 'Winston Churchill Ave (Ibis Hotel)', 'Cambridge Road(Student Union)', 'Cambridge Road(Spinnaker Sports)', 'Winston Churchill Ave (Law Courts)', 'Fratton Railway Station', 'Goldsmith Avenue (Lidl)', 'Goldsmith Avenue (Milton Park)', 'Langstone Campus'];
+
+        //Set Marker's LatLng 设置标记点
+        var locations = [
+          ['Langstone Campus', 50.796784, -1.041907, 4],
+          ['Locksway Road', 50.793440, -1.056964,4],
+          ['Goldsmith Avenue (Lidi)', 50.794917, -1.069517,4],
+          ['Goldsmith Avenue (Milton Park)', 50.792572, -1.058592,4],
+          ['Fratton Railway Station', 50.796025, -1.075952,4],
+          ['Winston Churchill Ave', 50.795470, -1.092348,4],
+          ['Cambridge Road', 50.794527, -1.096987,4],
+        ];
+
+        //This variable is not universal that could cause bus location error if did not change with other variable
+        var busStationSimLoc = [
+          //Stop Station
+          {lat: locations[0][1], lng: locations[0][2]},
+          {lat: locations[1][1], lng: locations[1][2]},
+          {lat: locations[2][1], lng: locations[2][2]},
+          {lat: locations[4][1], lng: locations[4][2]},
+          {lat: locations[5][1], lng: locations[5][2]},
+          {lat: locations[6][1], lng: locations[6][2]},
+          {lat: locations[6][1], lng: locations[6][2]},
+          {lat: locations[5][1], lng: locations[5][2]},
+          {lat: locations[4][1], lng: locations[4][2]},
+          {lat: locations[2][1], lng: locations[2][2]},
+          {lat: locations[3][1], lng: locations[3][2]},
+          {lat: locations[0][1], lng: locations[0][2]},
+
+        ];
+
+        var busStationEnroute = [
+          {lat: 50.793904, lng: -1.051111}, //Langstone - Locksway
+          {lat: 50.794604, lng: -1.066567}, //Locksway - Goldsmith
+          {lat: 50.795311, lng: -1.071623}, //Goldsmith - Fratton
+          {lat: 50.794770, lng: -1.079689}, //Fratton - Winston
+          {lat: 50.794280, lng: -1.095688}, //Winston - Cambridge
+          {lat: 50.794527, lng: -1.096987}, //Cambridge - Cambridge
+          {lat: 50.796140, lng: -1.095159}, //Cambridge - Winston
+          {lat: 50.794770, lng: -1.079689}, //Winston - Fratton
+          {lat: 50.795311, lng: -1.071623}, //Fratton - Goldsmith
+          {lat: 50.794604, lng: -1.066567}, //Goldsmith - Goldsmith Avenue (Milton Park)
+          {lat: 50.793904, lng: -1.051111}, //Goldsmith Avenue (Milton Park) - Langstone
+
+        ];
+
+
+
+        var lineLocations = [
+          //Langstone - Locksway
+          {lat: 50.796784, lng: -1.041907},
+          {lat: 50.796795, lng: -1.042146},
+          {lat: 50.795749, lng: -1.042149},
+          {lat: 50.795749, lng: -1.042248},
+          {lat: 50.794421, lng: -1.042239},
+          {lat: 50.793835, lng: -1.046299},
+          {lat: 50.794178, lng: -1.048975},
+          {lat: 50.793904, lng: -1.051111},
+          {lat: 50.793650, lng: -1.054983},
+          {lat: 50.793654, lng: -1.055911},
+          {lat: 50.793440, lng: -1.056964},
+          //Locksway - Goldsmith
+          {lat: 50.793131, lng: -1.057850},
+          {lat: 50.792447, lng: -1.057217},
+          {lat: 50.792111, lng: -1.056692},
+          {lat: 50.792243, lng: -1.057287},
+          {lat: 50.792285, lng: -1.057670},
+          {lat: 50.793879, lng: -1.062317},
+          {lat: 50.794182, lng: -1.063426},
+          {lat: 50.794604, lng: -1.066567},
+          {lat: 50.794776, lng: -1.067047},
+          {lat: 50.794947, lng: -1.067068},
+          {lat: 50.794974, lng: -1.067319},
+          {lat: 50.794824, lng: -1.067402},
+          {lat: 50.794710, lng: -1.068042},
+          {lat: 50.794917, lng: -1.069517},
+          //Goldsmith - Fratton
+          {lat: 50.795311, lng: -1.071623},
+          {lat: 50.795995, lng: -1.074740},
+          {lat: 50.796051, lng: -1.075728},
+          {lat: 50.796027, lng: -1.075974},
+          //Fratton - Winston
+          {lat: 50.795968, lng: -1.076340},
+          {lat: 50.795805, lng: -1.076588},
+          {lat: 50.795592, lng: -1.076796},
+          {lat: 50.795579, lng: -1.077153},
+          {lat: 50.795651, lng: -1.077326},
+          {lat: 50.795137, lng: -1.079183},
+          {lat: 50.794862, lng: -1.079159},
+          {lat: 50.794771, lng: -1.079379},
+          {lat: 50.794770, lng: -1.079689},
+          {lat: 50.794893, lng: -1.079917},
+          {lat: 50.794993, lng: -1.079946},
+          {lat: 50.795043, lng: -1.081037},
+          {lat: 50.794890, lng: -1.083442},
+          {lat: 50.794923, lng: -1.084884},
+          {lat: 50.795132, lng: -1.087674},
+          {lat: 50.795302, lng: -1.088549},
+          {lat: 50.795226, lng: -1.088765},
+          {lat: 50.795333, lng: -1.088990},
+          {lat: 50.795285, lng: -1.089716},
+          {lat: 50.795470, lng: -1.092348},
+          //Winston - Cambridge
+          {lat: 50.795539, lng: -1.093676},
+          {lat: 50.795492, lng: -1.094226},
+          {lat: 50.795204, lng: -1.094908},
+          {lat: 50.794977, lng: -1.095218},
+          {lat: 50.794623, lng: -1.095528},
+          {lat: 50.794280, lng: -1.095688},
+          {lat: 50.794651, lng: -1.095946},
+          {lat: 50.794755, lng: -1.096183},
+          {lat: 50.794749, lng: -1.096461},
+          {lat: 50.794527, lng: -1.096987},
+          //Return Line
+          {lat: 50.794749, lng: -1.096461},
+          {lat: 50.794919, lng: -1.096142},
+          {lat: 50.795058, lng: -1.095952},
+          {lat: 50.795631, lng: -1.095686},
+          {lat: 50.795990, lng: -1.095615},
+          {lat: 50.796140, lng: -1.095159},
+          {lat: 50.795823, lng: -1.094235},
+          {lat: 50.795698, lng: -1.093895},
+          {lat: 50.795563, lng: -1.093272},
+          {lat: 50.795470, lng: -1.092348},
+
+
+        ];
+
+      main();
+      window.setInterval(main, 10000);
 
 		  //初始化地图
-          function initMap() {
+      function initMap() {
 
-			//Set up markers 设置标记
-			/*var stop1 = {lat: 50.796784, lng: -1.041907};
-			var stop2 = {lat: 50.7940405, lng: -1.0552931};
-			var stop3 = {lat: 50.7945695, lng: -1.0690367};
-			var stop4 = {lat: 50.7958546, lng: -1.075254};
-			var stop5 = {lat: 50.7955254, lng:-1.0931081};
-			var stop6 = {lat: 50.7950578, lng:-1.0954583};*/
-
-			//Set Marker's LatLng 设置标记点
-			var locations = [
-				['Langstone Campus', 50.796784, -1.041907, 4],
-				['Locksway Road', 50.793440, -1.056964,4],
-				['Goldsmith Avenue (Lidi)', 50.794917, -1.069517,4],
-        ['Goldsmith Avenue (Milton Park)', 50.792572, -1.058592,4],
-				['Fratton Railway Station', 50.796025, -1.075952,4],
-				['Winston Churchill Ave', 50.795470, -1.092348,4],
-				['Cambridge Road', 50.794527, -1.096987,4],
-			];
-
-			var lineLocations = [
-				//Langstone - Locksway
-				{lat: 50.796784, lng: -1.041907},
-				{lat: 50.796795, lng: -1.042146},
-				{lat: 50.795749, lng: -1.042149},
-				{lat: 50.795749, lng: -1.042248},
-				{lat: 50.794421, lng: -1.042239},
-				{lat: 50.793835, lng: -1.046299},
-				{lat: 50.794178, lng: -1.048975},
-				{lat: 50.793904, lng: -1.051111},
-				{lat: 50.793650, lng: -1.054983},
-				{lat: 50.793654, lng: -1.055911},
-				{lat: 50.793440, lng: -1.056964},
-				//Locksway - Goldsmith
-				{lat: 50.793131, lng: -1.057850},
-				{lat: 50.792447, lng: -1.057217},
-				{lat: 50.792111, lng: -1.056692},
-				{lat: 50.792243, lng: -1.057287},
-				{lat: 50.792285, lng: -1.057670},
-				{lat: 50.793879, lng: -1.062317},
-				{lat: 50.794182, lng: -1.063426},
-				{lat: 50.794604, lng: -1.066567},
-				{lat: 50.794776, lng: -1.067047},
-				{lat: 50.794947, lng: -1.067068},
-				{lat: 50.794974, lng: -1.067319},
-				{lat: 50.794824, lng: -1.067402},
-				{lat: 50.794710, lng: -1.068042},
-				{lat: 50.794917, lng: -1.069517},
-				//Goldsmith - Fratton
-				{lat: 50.795995, lng: -1.074740},
-				{lat: 50.796051, lng: -1.075728},
-				{lat: 50.796027, lng: -1.075974},
-				//Fratton - Winston
-				{lat: 50.795968, lng: -1.076340},
-				{lat: 50.795805, lng: -1.076588},
-				{lat: 50.795592, lng: -1.076796},
-				{lat: 50.795579, lng: -1.077153},
-				{lat: 50.795651, lng: -1.077326},
-				{lat: 50.795137, lng: -1.079183},
-				{lat: 50.794862, lng: -1.079159},
-				{lat: 50.794771, lng: -1.079379},
-				{lat: 50.794770, lng: -1.079689},
-				{lat: 50.794893, lng: -1.079917},
-				{lat: 50.794993, lng: -1.079946},
-				{lat: 50.795043, lng: -1.081037},
-				{lat: 50.794890, lng: -1.083442},
-				{lat: 50.794923, lng: -1.084884},
-				{lat: 50.795132, lng: -1.087674},
-				{lat: 50.795302, lng: -1.088549},
-				{lat: 50.795226, lng: -1.088765},
-				{lat: 50.795333, lng: -1.088990},
-				{lat: 50.795285, lng: -1.089716},
-				{lat: 50.795470, lng: -1.092348},
-				//Winston - Cambridge
-				{lat: 50.795539, lng: -1.093676},
-				{lat: 50.795492, lng: -1.094226},
-				{lat: 50.795204, lng: -1.094908},
-				{lat: 50.794977, lng: -1.095218},
-				{lat: 50.794623, lng: -1.095528},
-				{lat: 50.794280, lng: -1.095688},
-				{lat: 50.794651, lng: -1.095946},
-				{lat: 50.794755, lng: -1.096183},
-				{lat: 50.794749, lng: -1.096461},
-				{lat: 50.794527, lng: -1.096987},
-				//Return Line
-				{lat: 50.794749, lng: -1.096461},
-				{lat: 50.794919, lng: -1.096142},
-				{lat: 50.795058, lng: -1.095952},
-				{lat: 50.795631, lng: -1.095686},
-				{lat: 50.795990, lng: -1.095615},
-				{lat: 50.796140, lng: -1.095159},
-				{lat: 50.795823, lng: -1.094235},
-				{lat: 50.795698, lng: -1.093895},
-				{lat: 50.795563, lng: -1.093272},
-				{lat: 50.795470, lng: -1.092348},
-
-
-			];
-
-			//Set basic attributes
+    			//Set basic attributes
             map = new google.maps.Map(document.getElementById('map'), {
-              center: {lat: 50.791499, lng: -1.0815219},
-              zoom: 14,
-			  gestureHandling: 'greedy',
-			  mapTypeControl: false,
-			  zoomControl:false,
-			  streetViewControl:false,
-			  fullscreenControl: false,
-            });
+            center: {lat: 50.791499, lng: -1.0815219},
+            zoom: 14,
+    			  gestureHandling: 'greedy',
+    			  mapTypeControl: false,
+    			  zoomControl:false,
+    			  streetViewControl:false,
+    			  fullscreenControl: false,
+                });
 
-			//Init marker name 设置标记名弹窗变量
-			var infowindow = new google.maps.InfoWindow();
+    			//Init marker name 设置标记名弹窗变量
+    			var infowindow = new google.maps.InfoWindow();
 
-			//Init marker and Counter var
-			var marker, i;
+    			//Init marker and Counter var
+    			var marker, i;
 
-			var stopImage = './asset/img/stopMarker.png';
+    			var stopImage = './asset/img/stopMarker.png';
 
-			//Set a loop to spawn markers 根据位置数量循环加载标记点
-			for (i = 0; i < locations.length; i++){
-				marker = new google.maps.Marker({
-					position: new google.maps.LatLng(locations[i][1],locations[i][2]),
-					animation: google.maps.Animation.DROP,
-					icon: stopImage,
-					map:map
-				});
+    			//Set a loop to spawn markers 根据位置数量循环加载标记点
+    			for (i = 0; i < locations.length; i++){
+    				marker = new google.maps.Marker({
+    					position: new google.maps.LatLng(locations[i][1],locations[i][2]),
+    					animation: google.maps.Animation.DROP,
+    					icon: stopImage,
+    					map:map
+    				});
 
-				//set up cilck event to display infoWindow & name
-				google.maps.event.addListener(marker, 'click', (function(marker, i) {
-					return function() {
-					  infowindow.setContent(locations[i][0]);
-					  infowindow.open(map, marker);
-					}
-				})(marker,i));
-			}
+      			//set up cilck event to display infoWindow & name
+      			google.maps.event.addListener(marker, 'click', (function(marker, i) {
+      				return function() {
+      					infowindow.setContent(locations[i][0]);
+      					infowindow.open(map, marker);
+      				}
+      			})(marker,i));
+    		  }
 
-			/*uniBus_Current = new google.mpas.Marker({
-				position: if()
-			});*/
+          //Bus marker
+          var bus1, bus2;
+          busImage = './asset/img/busMarker.png';
 
-			//Draw Line 绘制路线
-			var unibusLine = new google.maps.Polyline({
-				path: lineLocations,
-				geodesic: true,
-				strokeColor: '#5a498f',
-				strokeOpacity:1.0,
-				strokeWeight: 9
-			});
+          drawBus();
 
-			marker.setMap(map);
-			unibusLine.setMap(map);
+          bus1 = new google.maps.Marker({
+            position:(b1Location),
+            icon: busImage,
+            map:map
+          })
 
+          google.maps.event.addListener(bus1, 'click', (function(bus1) {
+            return function() {
+              content = (B1stopStation == 0) ? 'Bus 1 next station is: ' + B1nextStation : 'Bus 1 currently stop at: ' + B1stopStation + ' <br>Bus Next is: ' + B1nextStation;
+              infowindow.setContent(content);
+              infowindow.open(map, bus1);
+            }
+          })(bus1));
 
+          bus2 = new google.maps.Marker({
+            position:(b2Location),
+            icon: busImage,
+            map:map
+          })
+
+          google.maps.event.addListener(bus2, 'click', (function(bus2) {
+            return function() {
+              content = (B2stopStation == 0) ? 'Bus 2 next station is: ' + B2nextStation : 'Bus 2 currently stop at: ' + B2stopStation + ' <br>Bus Next is: ' + B2nextStation;
+              infowindow.setContent(content);
+              infowindow.open(map, bus2);
+            }
+          })(bus2));
+
+    			//Draw Line 绘制路线
+    			var unibusLine = new google.maps.Polyline({
+    				path: lineLocations,
+    				geodesic: true,
+    				strokeColor: '#5a498f',
+    				strokeOpacity:1.0,
+    				strokeWeight: 9
+    			});
+
+    			marker.setMap(map);
+          setTimeout(bus1.setMap(map), 10000);
+          setTimeout(bus2.setMap(map), 10000);
+    			unibusLine.setMap(map);
 
         }
 
 
 	//Bus realtime location and user location-base timer Calculator (BL/ULBT)
-
-  var uCS = 3; //user current station
-
-  //To get current time
-  function timeRefresh(){
-    var d = new Date();
-    var hours = d.getHours().toString();
-    var minute = d.getMinutes().toString();
-    hours = (minute.length = 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
-    //currentTime = parseInt(hours+minute);
-    currentTime = 811; // 4 debug
-    return currentTime;
-    console.log('c' + currentTime);
-  }
-
-
-  //NextStation and StopStation var
-	var B1nextStation;
-  var B2nextStation;
-	var B1stopStation;
-  var B2stopStation;
-  var nextStation;
-  var stopStation;
-
-  //Next Minute var
-  var B1nextMin;
-  var B2nextMin;
-  var left2CamTime;
-  var left2LanTime;
-  var left2CamTimeB2;
-  var left2LanTimeB2;
-
-  //Bus basic information
-	var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900]; //Bus1 Start time Each
-  var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
-  var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
-	var busStation=['Langstone Campus', 'Locks Way Road(Milton)','Goldsmith Avenue (Lidi)', 'Fratton Railway Station', 'Winston Churchill Ave (Ibis Hotel)', 'Cambridge Road(Student Union)', 'Cambridge Road(Spinnaker Sports)', 'Winston Churchill Ave (Law Courts)', 'Fratton Railway Station', 'Goldsmith Avenue (Lidl)', 'Goldsmith Avenue (Milton Park)', 'Langstone Campus'];
-
 
 	function getMin(time){
 		var time;
@@ -314,10 +393,10 @@
 
   			if(time > t1[i] && time < toEnd(t1[i])){
 
-
           findStation(t1[i]);
   				B1stopStation = stopStation;
           B1nextStation = nextStation;
+
           break;
         }
 
@@ -326,6 +405,8 @@
     //BUS2
 
     for(i = 0; i<t2.length;i++){
+
+
 
       //if the time is after the final bus2 then there are no bus2 anymore
       var lastBus2 = t2[t2.length-1]
@@ -343,7 +424,9 @@
 
       //Time is on a session and its able to find the stopStation and nextStation
       if(time > t2[i] && time < toEnd(t2[i])){
+
         findStation(t2[i]);
+
         B2stopStation = stopStation;
         B2nextStation = nextStation;
         break;
@@ -371,6 +454,7 @@
           nextStation = ((i == 0) ? busStation[0] : busStation[i+1]);
           stopStation = 0;
           break;
+
         }
 
         if(cal == 0){
@@ -504,7 +588,6 @@
                   for(d=0; d<nUCSB2;d++){LltB2 = timeAddFix(LltB2 + stationGap[d]);}
                   for(e=0; e<uCS;e++){LltxB2 = timeAddFix(LltxB2 + stationGap[e]);}
 
-
                   lTcalB2 = timeMinus(LltB2, currentTime);
                   left2LanTimeB2 = (lTcalB2>0) ? lTcalB2 : timeMinus(LltB2, currentTime);
                   left2CamTimeB2 = timeMinus(LltxB2, currentTime);
@@ -540,44 +623,95 @@
 
       return [left2LanTime, left2CamTime, left2CamTimeB2, left2LanTimeB2, leftCamTime, leftLanTime];
 
-      //B1nextStation =
 
     }
 
+    function drawBus(){
+
+      //Bus1
+      if(B1stopStation == 0){
+
+        for(i=0; i<busStation.length; i++){
+
+          if(B1nextStation == busStation[i]){
+            b1Num = (i-1 >= 0) ? i-1 : 0;
+            break;
+          }else{
+            b1Num = 0;
+          }
+        }
+        b1Location = busStationEnroute[b1Num];
+
+      }else{
+
+        for(i=0; i<busStation.length; i++){
+          if(B1stopStation == busStation[i]){
+            b1Num = i;
+            break;
+          }else{
+            b1Num = 0;
+          }
+        }
+        b1Location = busStationSimLoc[b1Num];
+      }
+
+      //Bus2
+      if(B2stopStation == 0){
+
+        for(i=0; i<busStation.length; i++){
+          if(B2nextStation == busStation[i]){
+            b2Num = (i-1 >= 0) ? i-1 : 0;
+            break;
+          }else{
+            b2Num = 0;
+          }
+        }
+        b2Location = busStationEnroute[b2Num];
 
 
+      }else{
+        for(i=0; i<busStation.length; i++){
+          if(B2stopStation == busStation[i]){
+            b2Num = i;
+            break;
+          }else{
+            b2Num = 0;
+          }
+        }
+        b2Location = busStationSimLoc[b2Num];
+      }
+    }
 
+    function imgFix(){
 
-
+    }
 
     function main(){
       timeRefresh();
       var nextbus = document.getElementById('next');
       var nextbus2 = document.getElementById('next2');
       var nearest = document.getElementById('nearest');
+
+      //If out of serives time
   		if(currentTime<740 || currentTime >= 1937){
 
   			bus1Status = 0;
         bus2Status = 0;
         v = 'University Bus not in services';
         nextbus.innerHTML = v;
-        //nextbus2.innerHTML = c;
 
   		}else{
         nextMinByUcs(uCS);
   			checkStation(currentTime);
-        v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
+        //v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
         k = 'To libray: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
         s = busStation[uCS];
         nearest.innerHTML = s;
-        nextbus.innerHTML = v;
+        //nextbus.innerHTML = v;
         nextbus2.innerHTML = k;
-        //console.log('B1 cam: ' + left2CamTime + ' B1 Lan:' + left2LanTime + ' B2 cam: ' + left2CamTimeB2 + ' B2 Lan: ' + left2LanTimeB2);
-        //console.log('Final LeftCamTime: ' + leftCamTime + ' LeftLanTime: ' + leftLanTime);
     }
   }
-  main();
-  window.setInterval(main, 20000);
+
 
     //main();
     //setTimeout(main(), 6000);
