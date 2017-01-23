@@ -239,7 +239,7 @@
       //Run all main function
       main();
       //Refresh All main function
-      window.setInterval(main, 10000);
+      window.setInterval(main, 3000);
 
 		  //Initialize Google Map
       function initMap() {
@@ -738,7 +738,6 @@
         k = 'To libray: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
         s = busStation[uCS];
         nearest.innerHTML = s;
-        //nextbus.innerHTML = v;
         nextbus2.innerHTML = k;
     }
   }
