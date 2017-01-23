@@ -78,8 +78,9 @@
           var hours = d.getHours().toString();
           var minute = d.getMinutes().toString();
           hours = (minute.length == 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
+          //Combine and fix to 3-4 digial number like 940, 1020 etc.
           currentTime = parseInt(hours+minute);
-          //currentTime = 1202; // 4 debug
+          //currentTime = 1646; // 4 debug
           return currentTime;
 
         }
@@ -106,7 +107,7 @@
         var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900]; //Bus1 Start time Each
         var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
         var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
-        var busStation=['Langstone Campus', 'Locks Way Road(Milton)','Goldsmith Avenue (Lidi)', 'Fratton Railway Station', 'Winston Churchill Ave (Ibis Hotel)', 'Cambridge Road(Student Union)', 'Cambridge Road(Spinnaker Sports)', 'Winston Churchill Ave (Law Courts)', 'Fratton Railway Station', 'Goldsmith Avenue (Lidl)', 'Goldsmith Avenue (Milton Park)', 'Langstone Campus'];
+        var busStation=['Langstone Campus', 'Locks Way Road(Milton)','Goldsmith Avenue (Lidi)', 'Fratton Railway Station(Depart)', 'Winston Churchill Ave (Ibis Hotel)', 'Cambridge Road(Student Union)', 'Cambridge Road(Spinnaker Sports)', 'Winston Churchill Ave (Law Courts)', 'Fratton Railway Station(Return)', 'Goldsmith Avenue (Lidl)', 'Goldsmith Avenue (Milton Park)', 'Langstone Campus'];
 
         //Set Marker's LatLng 设置标记点
         var locations = [
@@ -137,6 +138,7 @@
 
         ];
 
+        //Bus enroute station
         var busStationEnroute = [
           {lat: 50.793904, lng: -1.051111}, //Langstone - Locksway
           {lat: 50.794604, lng: -1.066567}, //Locksway - Goldsmith
@@ -153,7 +155,7 @@
         ];
 
 
-
+        //Route Line up
         var lineLocations = [
           //Langstone - Locksway
           {lat: 50.796784, lng: -1.041907},
@@ -234,10 +236,12 @@
 
         ];
 
+      //Run all main function
       main();
+      //Refresh All main function
       window.setInterval(main, 10000);
 
-		  //初始化地图
+		  //Initialize Google Map
       function initMap() {
 
     			//Set basic attributes
@@ -277,32 +281,39 @@
       			})(marker,i));
     		  }
 
-          //Bus marker
+          //Set up Bus marker
           var bus1, bus2;
+
           busImage = './asset/img/busMarker.png';
+          busImageInverse = './asset/img/busMarkerInv.png';
 
-          drawBus();
+          //Get current Bus Loaction.
+          drawBus()
 
+          B1img = (B1direction != 0) ? busImage : busImageInverse;
           bus1 = new google.maps.Marker({
             position:(b1Location),
-            icon: busImage,
+            icon: B1img,
             map:map
           })
 
+          //Bus1 marker onClick Function
           google.maps.event.addListener(bus1, 'click', (function(bus1) {
             return function() {
               content = (B1stopStation == 0) ? 'Bus 1 next station is: ' + B1nextStation : 'Bus 1 currently stop at: ' + B1stopStation + ' <br>Bus Next is: ' + B1nextStation;
               infowindow.setContent(content);
               infowindow.open(map, bus1);
-            }
-          })(bus1));
+              }
+            })(bus1));
 
+          B2img = (B2direction != 0) ? busImage : busImageInverse;
           bus2 = new google.maps.Marker({
             position:(b2Location),
-            icon: busImage,
+            icon: B2img,
             map:map
           })
 
+          //Bus2 marker onClick Function
           google.maps.event.addListener(bus2, 'click', (function(bus2) {
             return function() {
               content = (B2stopStation == 0) ? 'Bus 2 next station is: ' + B2nextStation : 'Bus 2 currently stop at: ' + B2stopStation + ' <br>Bus Next is: ' + B2nextStation;
@@ -310,6 +321,20 @@
               infowindow.open(map, bus2);
             }
           })(bus2));
+          //Bus marker set up on map
+          bus1.setMap(map);
+          bus2.setMap(map);
+
+
+          //Update Bus Location
+          setInterval(function markerBus(){
+            drawBus();
+            bus1.setPosition(b1Location);
+            bus2.setPosition(b2Location);
+          }, 3000);
+
+
+
 
     			//Draw Line 绘制路线
     			var unibusLine = new google.maps.Polyline({
@@ -321,12 +346,14 @@
     			});
 
     			marker.setMap(map);
-          setTimeout(bus1.setMap(map), 10000);
-          setTimeout(bus2.setMap(map), 10000);
+
+          //setTimeout(bus1.setMap(map), 10000);
+          //setTimeout(bus2.setMap(map), 10000);
     			unibusLine.setMap(map);
 
         }
 
+//ALL PRE-READY FUNCTION DOWN HERE
 
 	//Bus realtime location and user location-base timer Calculator (BL/ULBT)
 
@@ -388,6 +415,7 @@
         if(time <= t1[i] && time >= toEnd(t1[i-1])){
           B1stopStation = busStation[0];
           B1nextStation = busStation[1];
+          B1direction = 0;
           break;
         }
 
@@ -396,7 +424,7 @@
           findStation(t1[i]);
   				B1stopStation = stopStation;
           B1nextStation = nextStation;
-
+          B1direction = BusDirection;
           break;
         }
 
@@ -413,12 +441,14 @@
       if(time > toEnd(lastBus2)){
         B2stopStation = 99;
         B2nextStation = 99;
+        B2direction = 0;
       }
 
       //if time is out of the session range that mean is bus break time
       if(time <= t2[i] && time >= toEnd(t2[i-1])){
         B2stopStation = busStation[0];
         B2nextStation = busStation[1];
+        B2direction = 0;
         break;
       }
 
@@ -426,33 +456,33 @@
       if(time > t2[i] && time < toEnd(t2[i])){
 
         findStation(t2[i]);
-
         B2stopStation = stopStation;
         B2nextStation = nextStation;
+        B2direction = BusDirection;
         break;
       }
 
 
     }
 
-			return [B1stopStation, B1nextStation, B2stopStation, B2nextStation];
+			return [B1stopStation, B1nextStation, B2stopStation, B2nextStation, B1direction, B2direction];
 	}
-
     //A function for find next station by bus start time.
     function findStation(ts){
 
       //ts = t[i] ts为起驶时间 ts is the start time
       var ts;
-      var cS = ts;
+      var cS = ts; //Start Time ready to add station gap and update to Station Time
       var cT = currentTime;
 
       for(i=0; i<stationGap.length;i++){
-        cS = timeAddFix(cS + stationGap[i]);
+        cS = timeAddFix(cS + stationGap[i]); //Station Time
         var cal = cT - cS;
 
         if(cal < 0){
           nextStation = ((i == 0) ? busStation[0] : busStation[i+1]);
           stopStation = 0;
+          BusDirection = (i <= 5) ? 0 : 1; //bus direction: 0 = depart, 1 = arrive
           break;
 
         }
@@ -460,11 +490,12 @@
         if(cal == 0){
           nextStation = ((i+1 <= 12) ? busStation[i+2] : busStation[0]);
           stopStation = ((i == 0) ? busStation[i+1] : busStation[i+1]);
+          BusDirection = (i <= 5) ? 0 : 1;
           break;
         }
       }
 
-      return [nextStation, stopStation];
+      return [nextStation, stopStation, BusDirection];
     }
 
 
@@ -682,9 +713,7 @@
       }
     }
 
-    function imgFix(){
 
-    }
 
     function main(){
       timeRefresh();
@@ -703,6 +732,8 @@
   		}else{
         nextMinByUcs(uCS);
   			checkStation(currentTime);
+        leftCamTime = (leftCamTime != 99) ? leftCamTime : 'updating...';
+        leftLanTime = (leftLanTime != 99) ? leftLanTime : 'updating...'
         //v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
         k = 'To libray: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
         s = busStation[uCS];
@@ -711,7 +742,3 @@
         nextbus2.innerHTML = k;
     }
   }
-
-
-    //main();
-    //setTimeout(main(), 6000);
