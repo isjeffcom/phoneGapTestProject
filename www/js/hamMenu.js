@@ -23,6 +23,7 @@ var whooper = {
 		ctx.translate(-75,-75);
 	},
 	create: function(obj){
+
 		var nw = {
 			color: "#FFFFFF",
 			state: 0,
@@ -51,6 +52,7 @@ var whooper = {
 					if(smaller > bigger) clearInterval(loop);
 				}, interval);
 				this.state = end;
+
 			},
 			rotate: function(duration){
 				var state = this.state;
@@ -58,10 +60,12 @@ var whooper = {
 				if(check != Math.floor(check)){
 					var start = state - (100*Math.floor(state/100));
 					var end;
+
 					if(Math.abs(state-0)<Math.abs(state-50)) end = 0;
 					else if(Math.abs(state-100)<Math.abs(state-50)) end = 100;
 					else end = 50;
 					this.animate(start, end, duration);
+
 					//state = 0;
 				}else this.animate(state, state+50, duration);
 			}
@@ -69,6 +73,7 @@ var whooper = {
 		return nw;
 	},
 	Instance: function(obj){
+
 		//this.obj = obj;
 		this.color = "#FFFFFF";
 		this.state = 0;
@@ -107,14 +112,14 @@ var whooper = {
 			if(check != Math.floor(check)){
 				var start = state - (100*Math.floor(state/100));
 				var end;
+
 				if(Math.abs(state-0)<Math.abs(state-50)) end = 0;
 				else if(Math.abs(state-100)<Math.abs(state-50)) end = 100;
 				else end = 50;
 				this.animate(start, end, duration);
+
 				//state = 0;
 			}else this.animate(state, state+50, duration);
 		};
 	}
 }
-
-
