@@ -11,6 +11,9 @@
 */
 
 
+var latitude;
+var longitude;
+
           // 等待加载PhoneGap
           document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -40,8 +43,11 @@
             var longitude = position.coords.longitude;
 
 
+
             //    Google Maps API set center:
             map.setCenter({ lat: latitude, lng: longitude});
+            return [latitude, longitude];
+
           }
 
           // onError回调函数接收一个PositionError对象
@@ -49,26 +55,6 @@
             alert('code: '    + error.code    + '\n' +
               'message: ' + error.message + '\n');
           }
-
-          /*
-          Return Var:
-          uCS = User Current Station Number
-          busStation[uCS] = User Current Station name
-
-          ^Base on Bus location
-          B1stopStation = Bus 1 Currently Stop Station
-          B2stopStation = Bus 2 Currently Stop Station
-          B1nextStation = Bus 1 Next Stop Station
-          B2nextStation = Bus2 Next Stop Station
-
-          ^Base on User Location
-          leftCamTime = Next bus time to Cambridge Road (Library)
-          leftLanTime = Next bus time to Langstone (Student Village)
-          left2CamTime = Bus 1 next time to Cambridge Road
-          left2CamTimeB2 = Bus 2 next time to Cambridge Road
-          left2LanTime = Bus 1 next time to Langstone
-          left2LanTimeB2 Bus 2 next time to Langstone
-          */
 
         var map;
 
@@ -79,8 +65,8 @@
           var minute = d.getMinutes().toString();
           hours = (minute.length == 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
           //Combine and fix to 3-4 digial number like 940, 1020 etc.
-          currentTime = parseInt(hours+minute);
-          //currentTime = 1646; // 4 debug
+          //currentTime = parseInt(hours+minute);
+          currentTime = 0848; // 4 debug
           return currentTime;
 
         }
@@ -100,6 +86,12 @@
         var left2LanTime;
         var left2CamTimeB2;
         var left2LanTimeB2;
+        var B1direction;
+        var B2direction;
+        var B1StartTime;
+        var B2StartTime;
+        var B1tempTime;
+        var B2tempTime;
 
         var uCS = 3; //user current station
 
@@ -321,6 +313,14 @@
               infowindow.open(map, bus2);
             }
           })(bus2));
+
+          //Center map by click nav float Btn
+          var navBtn = document.getElementById('navBtn');
+          navBtn.addEventListener('click', function() {
+               map.setCenter({ lat: latitude, lng: longitude});
+               //map.setCenter({lat: 50.795058, lng: -1.095952}); //for debug
+          });
+
           //Bus marker set up on map
           bus1.setMap(map);
           bus2.setMap(map);
@@ -416,15 +416,18 @@
           B1stopStation = busStation[0];
           B1nextStation = busStation[1];
           B1direction = 0;
+          B1StartTime = 1;
           break;
         }
 
-  			if(time > t1[i] && time < toEnd(t1[i])){
-
+  			if(time >= t1[i] && time <= toEnd(t1[i])){
+          B1StartTime = t1[i];
           findStation(t1[i]);
   				B1stopStation = stopStation;
           B1nextStation = nextStation;
           B1direction = BusDirection;
+
+
           break;
         }
 
@@ -434,14 +437,13 @@
 
     for(i = 0; i<t2.length;i++){
 
-
-
       //if the time is after the final bus2 then there are no bus2 anymore
       var lastBus2 = t2[t2.length-1]
       if(time > toEnd(lastBus2)){
         B2stopStation = 99;
         B2nextStation = 99;
         B2direction = 0;
+        B1StartTime = 0;
       }
 
       //if time is out of the session range that mean is bus break time
@@ -449,23 +451,25 @@
         B2stopStation = busStation[0];
         B2nextStation = busStation[1];
         B2direction = 0;
+        B1StartTime = 1;
         break;
       }
 
       //Time is on a session and its able to find the stopStation and nextStation
-      if(time > t2[i] && time < toEnd(t2[i])){
-
+      if(time >= t2[i] && time <= toEnd(t2[i])){
+        B2StartTime = t2[i];
         findStation(t2[i]);
         B2stopStation = stopStation;
         B2nextStation = nextStation;
         B2direction = BusDirection;
+
         break;
       }
 
 
     }
 
-			return [B1stopStation, B1nextStation, B2stopStation, B2nextStation, B1direction, B2direction];
+			return [B1stopStation, B1nextStation, B2stopStation, B2nextStation, B1direction, B2direction, B1StartTime, B2StartTime];
 	}
     //A function for find next station by bus start time.
     function findStation(ts){
@@ -532,7 +536,7 @@
           if(time > t1[i] && time < toEnd(t1[i])){ //Get Session
 
 
-            var NstationTime = t1[i]; //Get Start Time
+            NstationTime = t1[i]; //Get Start Time
 
             for(c=0; c<uCS;c++){NstationTime = timeAddFix(NstationTime + stationGap[c]);} //Add to the next time the bus about to stop
 
@@ -589,7 +593,7 @@
                   break;
                 }
 
-                var NstationTimeB2 = t2[i];
+                NstationTimeB2 = t2[i];
                 for(c=0; c<uCS;c++){NstationTimeB2 = timeAddFix(NstationTimeB2 + stationGap[c]);}
 
                 if (time < t1[i+1]){ // Don't change, t is right !!!
@@ -715,11 +719,94 @@
 
 
 
+    function dS2update(){
+      var dsNextSta = document.getElementById('ds2nextSta');
+      var dStime = document.getElementsByClassName('dStime');
+      if(selectBusStatus % 2 == 0){ //if bus 2
+        dsNextSta.innerHTML = B2nextStation;
+        if(B2direction == 0){
+          lineCoverB2T.style.WebkitAnimationName = 'moveB2T';
+          lineCoverT2B.style.WebkitAnimationName = 'none';
+          B2tempTime = B2StartTime;
+
+          for(i=0;i<=5;i++){
+            dStime[Math.abs(i-5)].innerHTML = B2tempTime;
+            B2tempTime += stationGap[i];
+
+          }
+        }else{
+          lineCoverB2T.style.WebkitAnimationName = 'none';
+          lineCoverT2B.style.WebkitAnimationName = 'moveT2B';
+          B2tempTime = B2StartTime;
+
+          for(i=6;i<=11;i++){
+            dStime[i-6].innerHTML = B2tempTime;
+            B2tempTime += stationGap[i];
+
+          }
+        }
+      }
+
+      if(selectBusStatus % 2 == 1){ //if bus1
+        dsNextSta.innerHTML = B1nextStation;
+        if(B1direction == 0){
+          lineCoverB2T.style.WebkitAnimationName = 'moveB2T';
+          lineCoverT2B.style.WebkitAnimationName = 'none';
+          B1tempTime = B1StartTime;
+          for(i=0;i<=6;i++){
+
+            dStime[Math.abs(i-5)].innerHTML = B1tempTime;
+            B1tempTime += stationGap[i];
+          }
+        }else{
+          lineCoverB2T.style.WebkitAnimationName = 'none';
+          lineCoverT2B.style.WebkitAnimationName = 'moveT2B';
+          B1tempTime = B1StartTime;
+          for(i=6;i<=11;i++){
+            dStime[i-6].innerHTML = B1tempTime;
+            B1tempTime += stationGap[i];
+          }
+        }
+      }
+    }
+
+    //Click change button to change information by different bus
+    var changeBtn = document.getElementById('changeBtn');
+    var lineCoverB2T = document.getElementById('lineCoverB2T');
+    var lineCoverT2B = document.getElementById('lineCoverT2B');
+    var selectBusStatus = 1;
+    //Change bug by click change float Btn
+    changeBtn.addEventListener('click', function() {
+      dS2update();
+      var list = document.getElementById('stationList');
+      var line = document.getElementById('line');
+      if(selectBusStatus % 2 == 0){
+        if(B2direction == 0){
+          lineCoverB2T.style.WebkitAnimationName = 'moveB2T';
+          lineCoverT2B.style.WebkitAnimationName = 'none';
+        }
+        if(B2direction == 1){
+          lineCoverB2T.style.WebkitAnimationName = 'none';
+          lineCoverT2B.style.WebkitAnimationName = 'moveT2B';
+        }
+        list.style.WebkitAnimationName = 'fadeInOut';
+        line.style.WebkitAnimationName = 'fadeInOut';
+      }else{
+        list.style.WebkitAnimationName = 'fadeInOut2';
+        line.style.WebkitAnimationName = 'fadeInOut2';
+      }
+      dS2update();
+      selectBusStatus++;
+    });
+
+
+    //Main Excutive funcion, Main controller
     function main(){
       timeRefresh();
       var nextbus = document.getElementById('next');
       var nextbus2 = document.getElementById('next2');
       var nearest = document.getElementById('nearest');
+      var floatBtn = document.getElementById('floatBtn');
 
       //If out of serives time
   		if(currentTime<740 || currentTime >= 1937){
@@ -728,10 +815,14 @@
         bus2Status = 0;
         v = 'University Bus not in services';
         nextbus.innerHTML = v;
-
+        floatBtn.style.display = 'none';
+        //Bus start time NstationTime ,NstationTimeB2
+        //Bus direction B1direction, B2direction
+        //bus direction: 0 = depart, 1 = arrive
   		}else{
         nextMinByUcs(uCS);
   			checkStation(currentTime);
+        dS2update();
         leftCamTime = (leftCamTime != 99) ? leftCamTime : 'updating...';
         leftLanTime = (leftLanTime != 99) ? leftLanTime : 'updating...'
         //v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
@@ -740,4 +831,12 @@
         nearest.innerHTML = s;
         nextbus2.innerHTML = k;
     }
+  }
+
+
+
+
+
+  function footBar(){
+
   }

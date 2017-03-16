@@ -38,7 +38,7 @@
 <body>
 		<div class='topbar'>
 			<canvas id="hamMenu" height="170" width="170"></canvas>
-			<div class='topbar_logo'><!--img src='./asset/img/topBarLogo.png'/--><a>UPBUS</a></div>
+			<div class='topbar_logo' id='logo'><!--img src='./asset/img/topBarLogo.png'/--><a>UPBUS</a></div>
 		</div>
 
     <div class='sidebar' id='sb'>
@@ -56,36 +56,7 @@
     </div>
 
 
-    <script type="text/javascript">
-      //Sidebar contorller
-  		window.onload = function(){
-  				var canvas = document.getElementById("hamMenu"); //get canvas
-  				var icon = whooper.create(canvas);             //create whooper instance
-          var sidebar = document.getElementById("sb")      //get sidebar
-  				icon.color = "#333333";                       //change color (default is white)
-  				icon.set(0);                                 //draw frame No 0
-
-  				//add click listener to the canvas
-  				canvas.addEventListener("click", function(){ icon.rotate(200); });
-          canvas.addEventListener("click", function(){
-
-            if(icon.state != ''){
-              var c = icon.state/50;
-              var b = c % 2;
-              if(b == 0){
-                sidebar.style.WebkitAnimationName = "moveLeft";
-                canvas.style.marginLeft='-6pt';
-                icon.color = "#333333";
-              }else{
-                sidebar.style.WebkitAnimationName = "moveRight";
-                canvas.style.marginLeft='6pt';
-                icon.color = "#ffffff";
-              }
-            }
-          });
-
-  		};
-  	</script>
+    <script src='./js/sidebar.js' type="text/javascript"></script>
 
     <div class='footbar' id='fb'>
       <div id='dS1'>
@@ -94,8 +65,94 @@
         <p id='next2'></p>
       </div>
 
+      <div class='dS2' id='dS2'>
+        <p id='ds2title'>Next Station</p>
+        <p id='ds2nextSta'>Fratton Railway Station</p>
+        <div class='stationList' id='stationList'>
+
+          <div class='stationListCantainer' id='sLC1'>
+            <div class='circleBIG'>
+              <img src='./asset/img/uni.png'>
+            </div>
+            <div class='dStext'>
+              <a class='dStime'></a><br>
+              <a class='dSstationName'>Cambridge Road (Student Union)</a>
+            </div>
+          </div>
+
+          <div class='stationListCantainer' id='sLC2'>
+            <div class='circle'>
+              <div class='innerCircle'></div>
+            </div>
+            <div class='dStext'>
+              <a class='dStime'></a><br>
+              <a class='dSstationName'>Winston Churchil Avenue (Eldon Building)</a>
+            </div>
+          </div>
+
+          <div class='stationListCantainer' id='sLC3'>
+            <div class='circle'>
+              <div class='innerCircle'></div>
+            </div>
+            <div class='dStext'>
+              <a class='dStime'></a><br>
+              <a class='dSstationName'>Fratton Railway Station</a>
+            </div>
+          </div>
+
+          <div class='stationListCantainer' id='sLC4'>
+            <div class='circle'>
+              <div class='innerCircle'></div>
+            </div>
+            <div class='dStext'>
+              <a class='dStime'></a><br>
+              <a class='dSstationName'>Goldsmith Ave (Lidl)</a>
+            </div>
+          </div>
+
+          <div class='stationListCantainer' id='sLC5'>
+            <div class='circle'>
+              <div class='innerCircle'></div>
+            </div>
+            <div class='dStext'>
+              <a class='dStime'></a><br>
+              <a class='dSstationName'>Goldsmith Ave (Milton Parks) or Locksway</a>
+            </div>
+          </div>
+
+          <div class='stationListCantainer' id='sLC6'>
+            <div class='circleBIG'>
+              <img src='./asset/img/home.png'>
+            </div>
+            <div class='dStext'>
+              <a class='dStime'></a><br>
+              <a class='dSstationName'>Langstone</a>
+            </div>
+          </div>
+
+
+
+        </div>
+
+        <div class='line' id='line'> </div>
+        <div class='lineCoverB2T' id='lineCoverB2T'> </div>
+        <div class='lineCoverT2B' id='lineCoverT2B'> </div>
+      </div>
 
     </div>
+
+    <div class='floatBtn' id='floatBtn'>
+
+      <div class='circleBIG' id='navBtn'>
+        <img src='./asset/img/nav.png'>
+      </div>
+
+      <div class='circleBIG' id='changeBtn'>
+        <img src='./asset/img/path.png'>
+      </div>
+
+    </div>
+
     <script src='./js/footbar.js'></script>
 
         <!--Google Maps Initialize-->
