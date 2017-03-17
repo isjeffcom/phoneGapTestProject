@@ -11,8 +11,7 @@
 */
 
 
-var latitude;
-var longitude;
+
 
           // 等待加载PhoneGap
           document.addEventListener("deviceready", onDeviceReady, false);
@@ -24,7 +23,8 @@ var longitude;
           }
 
 
-
+          var latitude;
+          var longitude;
           // 获取位置信息成功时调用的回调函数
           function onSuccess(position) {
             var element = document.getElementById('geolocation');
@@ -66,7 +66,7 @@ var longitude;
           hours = (minute.length == 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
           //Combine and fix to 3-4 digial number like 940, 1020 etc.
           //currentTime = parseInt(hours+minute);
-          currentTime = 0848; // 4 debug
+          currentTime = 1151; // 4 debug
           return currentTime;
 
         }
@@ -92,14 +92,19 @@ var longitude;
         var B2StartTime;
         var B1tempTime;
         var B2tempTime;
+        var ifNight = 0;
 
-        var uCS = 3; //user current station
+        //DOM
+        var stationList = document.getElementById('stationList');
+        var stationListLine = document.getElementById('line');
+        var fb = document.getElementById('fb');
+        var uCS = document.getElementById('selection').value; //user current station
 
         //Bus basic information
-        var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900]; //Bus1 Start time Each
+        var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900, 2040, 2120, 2200, 2240]; //Bus1 Start time Each
         var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
         var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
-        var busStation=['Langstone Campus', 'Locks Way Road(Milton)','Goldsmith Avenue (Lidi)', 'Fratton Railway Station(Depart)', 'Winston Churchill Ave (Ibis Hotel)', 'Cambridge Road(Student Union)', 'Cambridge Road(Spinnaker Sports)', 'Winston Churchill Ave (Law Courts)', 'Fratton Railway Station(Return)', 'Goldsmith Avenue (Lidl)', 'Goldsmith Avenue (Milton Park)', 'Langstone Campus'];
+        var busStation=['Langstone Campus', 'Locks Way Road','Goldsmith Avenue', 'Fratton Railway Station', 'Winston Churchill Ave', 'Cambridge Road(Student Union)', 'Cambridge Road', 'Winston Churchill Ave', 'Fratton Railway Station', 'Goldsmith Avenue', 'Goldsmith Avenue', 'Langstone Campus'];
 
         //Set Marker's LatLng 设置标记点
         var locations = [
@@ -426,8 +431,6 @@ var longitude;
   				B1stopStation = stopStation;
           B1nextStation = nextStation;
           B1direction = BusDirection;
-
-
           break;
         }
 
@@ -443,7 +446,7 @@ var longitude;
         B2stopStation = 99;
         B2nextStation = 99;
         B2direction = 0;
-        B1StartTime = 0;
+        B2StartTime = 0;
       }
 
       //if time is out of the session range that mean is bus break time
@@ -451,7 +454,7 @@ var longitude;
         B2stopStation = busStation[0];
         B2nextStation = busStation[1];
         B2direction = 0;
-        B1StartTime = 1;
+        B2StartTime = 1;
         break;
       }
 
@@ -515,7 +518,6 @@ var longitude;
             LltS = t1[i];
             LltSx = t1[i];
             nUCSS = 11-uCS;
-
             for(s=0; s<uCS;s++){LltS = timeAddFix(LltS + stationGap[s]);}
             for(s=0; s<nUCSS;s++){LltSx = timeAddFix(LltSx + stationGap[s]);}
 
@@ -531,12 +533,41 @@ var longitude;
             break;
           }
 
+
+
+
           //Bus1
 
           if(time > t1[i] && time < toEnd(t1[i])){ //Get Session
 
-
             NstationTime = t1[i]; //Get Start Time
+
+            //NightBus time
+            if(typeof t2[i] == 'undefined' || t2[i] == null || t2[i] == ''){
+
+
+
+              for(c=0; c<uCS;c++){NstationTime = timeAddFix(NstationTime + stationGap[c]);} //Add to the next time the bus about to stop
+
+
+              var Llt = t1[i]; //Llt == start returned bus arriving time
+              var Lltx = timeMinus(t1[i+1], 20); //Lltx == start departure bus arriving time
+
+               //minus and return the result to check if user still can catch the bus
+              nUCS = 11-uCS; //Opposite same station in one round.
+
+              for(d=0; d<nUCS;d++){Llt = timeAddFix(Llt + stationGap[d]);} //Llt == calculate returned bus arriving time
+              for(e=0; e<uCS;e++){Lltx = timeAddFix(Lltx + stationGap[e]);} //Lltx == calcute departure bus arriving time
+
+              lTcal = timeMinus(NstationTime, currentTime);
+              left2CamTime = (lTcal>0) ? lTcal : timeMinus(Lltx, currentTime);
+              left2LanTime = timeMinus(Llt, currentTime);
+              ifNight = 1;
+              break;
+
+            }
+
+
 
             for(c=0; c<uCS;c++){NstationTime = timeAddFix(NstationTime + stationGap[c]);} //Add to the next time the bus about to stop
 
@@ -556,6 +587,7 @@ var longitude;
               break;
 
             }
+
 
 
 
@@ -633,7 +665,6 @@ var longitude;
               }
       }
 
-
       //Fix a problem that if the time is out of the session that this function could return a undefined value cause uncountable final result.
 
       left2CamTime = (typeof left2CamTime == 'undefined') ? 99 : left2CamTime;
@@ -656,7 +687,7 @@ var longitude;
         leftLanTime = (left2LanTime < left2LanTimeB2) ? left2LanTime : left2LanTimeB2;
       }
 
-      return [left2LanTime, left2CamTime, left2CamTimeB2, left2LanTimeB2, leftCamTime, leftLanTime];
+      return [left2LanTime, left2CamTime, left2CamTimeB2, left2LanTimeB2, leftCamTime, leftLanTime, ifNight];
 
 
     }
@@ -717,54 +748,109 @@ var longitude;
       }
     }
 
+    function checkNight(){
+      if(ifNight == 1){
 
+        var circle = document.getElementsByClassName('circle');
+        fb.style.backgroundColor='#091835';
+        for(i=0;i<circle.length;i++){
+          circle[i].style.backgroundColor='#091835';
+        }
+
+      }
+    }
 
     function dS2update(){
       var dsNextSta = document.getElementById('ds2nextSta');
       var dStime = document.getElementsByClassName('dStime');
+
+
+
       if(selectBusStatus % 2 == 0){ //if bus 2
+
+        if(B2StartTime == 0 || typeof B2StartTime == 'undefined'){
+          dsNextSta.innerHTML = 'Bus is in breaktime, please check the timetable';
+          stationList.style.display = 'none';
+          line.style.display = 'none';
+          lineCoverB2T.style.WebkitAnimationName = 'none';
+          lineCoverT2B.style.WebkitAnimationName = 'none';
+          return;
+        }
+
         dsNextSta.innerHTML = B2nextStation;
         if(B2direction == 0){
+          stationList.style.display = 'block';
+          line.style.display = 'block';
           lineCoverB2T.style.WebkitAnimationName = 'moveB2T';
           lineCoverT2B.style.WebkitAnimationName = 'none';
           B2tempTime = B2StartTime;
 
           for(i=0;i<=5;i++){
             dStime[Math.abs(i-5)].innerHTML = B2tempTime;
-            B2tempTime += stationGap[i];
+            B2tempTime = timeAddFix(B2tempTime + stationGap[i]);
+            if(i>= 5){
+              return;
+            }
 
           }
         }else{
+          stationList.style.display = 'block';
+          line.style.display = 'block';
           lineCoverB2T.style.WebkitAnimationName = 'none';
           lineCoverT2B.style.WebkitAnimationName = 'moveT2B';
           B2tempTime = B2StartTime;
 
-          for(i=6;i<=11;i++){
-            dStime[i-6].innerHTML = B2tempTime;
-            B2tempTime += stationGap[i];
+          for(i=0;i<=stationGap.length;i++){
 
+            B2tempTime = timeAddFix(B2tempTime + stationGap[i]);
+            if(i>=5){
+              if(i-5 >= 6){
+                return;
+              }
+              dStime[i-5].innerHTML = B2tempTime;
+            }
           }
         }
       }
 
       if(selectBusStatus % 2 == 1){ //if bus1
+        if(B1StartTime == 0 || typeof B1StartTime == 'undefined'){
+          dsNextSta.innerHTML = 'Bus is in breaktime, please check the timetable';
+          stationList.style.display = 'none';
+          line.style.display = 'none';
+          lineCoverT2B.style.WebkitAnimationName = 'none';
+          lineCoverB2T.style.WebkitAnimationName = 'none';
+          return;
+        }
         dsNextSta.innerHTML = B1nextStation;
+        //if bus depart
         if(B1direction == 0){
+          stationList.style.display = 'block';
+          line.style.display = 'block';
           lineCoverB2T.style.WebkitAnimationName = 'moveB2T';
           lineCoverT2B.style.WebkitAnimationName = 'none';
           B1tempTime = B1StartTime;
           for(i=0;i<=6;i++){
-
             dStime[Math.abs(i-5)].innerHTML = B1tempTime;
-            B1tempTime += stationGap[i];
+            B1tempTime = timeAddFix(B1tempTime + stationGap[i]);
+            if(i>= 5){
+              return;
+            }
           }
-        }else{
+        }else{ //if bus return
+          stationList.style.display = 'block';
+          line.style.display = 'block';
           lineCoverB2T.style.WebkitAnimationName = 'none';
           lineCoverT2B.style.WebkitAnimationName = 'moveT2B';
           B1tempTime = B1StartTime;
-          for(i=6;i<=11;i++){
-            dStime[i-6].innerHTML = B1tempTime;
-            B1tempTime += stationGap[i];
+          for(i=0;i<=stationGap.length;i++){
+            B1tempTime = timeAddFix(B1tempTime + stationGap[i]);
+            if(i>=5){
+              if(i-5 >= 6){
+                return;
+              }
+              dStime[i-5].innerHTML = B1tempTime;
+            }
           }
         }
       }
@@ -802,6 +888,8 @@ var longitude;
 
     //Main Excutive funcion, Main controller
     function main(){
+      uCS = document.getElementById('selection').value;
+
       timeRefresh();
       var nextbus = document.getElementById('next');
       var nextbus2 = document.getElementById('next2');
@@ -809,12 +897,14 @@ var longitude;
       var floatBtn = document.getElementById('floatBtn');
 
       //If out of serives time
-  		if(currentTime<740 || currentTime >= 1937){
+  		if(currentTime<740 || currentTime >= 2240){
 
   			bus1Status = 0;
         bus2Status = 0;
-        v = 'University Bus not in services';
-        nextbus.innerHTML = v;
+        text = 'University Bus not in services, please check the timetable';
+        stationList.style.display = 'none';
+        line.style.display = 'none';
+        nextbus.innerHTML = text;
         floatBtn.style.display = 'none';
         //Bus start time NstationTime ,NstationTimeB2
         //Bus direction B1direction, B2direction
@@ -823,8 +913,10 @@ var longitude;
         nextMinByUcs(uCS);
   			checkStation(currentTime);
         dS2update();
-        leftCamTime = (leftCamTime != 99) ? leftCamTime : 'updating...';
-        leftLanTime = (leftLanTime != 99) ? leftLanTime : 'updating...'
+        checkNight();
+
+        leftCamTime = (leftCamTime != 99) ? leftCamTime : 'updating';
+        leftLanTime = (leftLanTime != 99) ? leftLanTime : 'updating';
         //v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
         k = 'To libray: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
         s = busStation[uCS];

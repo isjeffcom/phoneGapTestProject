@@ -21,9 +21,11 @@
 }
 html{
   height: 100%;
+  width:100%;
   margin: 0;
   padding: 0;
   background:-webkit-linear-gradient(top, rgba(90,73,143,0.3), rgba(255,0,0,0));
+  overflow:hidden;
 }
 
 

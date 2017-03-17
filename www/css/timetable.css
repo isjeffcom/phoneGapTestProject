@@ -1,0 +1,26 @@
+.topbar{
+  height:10%;
+  width:100%;
+  top:0pt;
+  background-color: #5a498f;
+}
+
+canvas#hamMenu{
+  display:none;
+}
+
+.topbar_logo{
+  color:#fafafa;
+  margin-left: 24pt;
+  margin-top: 15pt;
+}
+
+.topbar_logo a{
+  color:#fafafa;
+}
+
+.timetable{
+  width:100%;
+  height:100%;
+  background-color: #fafafa;
+}

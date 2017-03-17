@@ -11,13 +11,13 @@
 }
 
 @keyframes dUp {
-  0% {transform: translate(0pt,0pt);width:92%;}
-	100% {transform: translate(0pt,-380pt);width:100%; margin-left:0pt;margin-right:0pt;}
+  0% {transform: translate(0pt,0pt);width:92%; height:15%; margin-top: 0pt;}
+	100% {transform: translate(0pt,-380pt);width:100%; height:120%; margin-left:0pt;margin-right:0pt; margin-top: 24pt;}
 }
 
 @keyframes dDown {
-  0% {transform: translate(0pt,-380pt);width:100%;}
-	100% {transform: translate(0pt,0pt);width:92%; margin-left:4%;margin-right:4%;}
+  0% {transform: translate(0pt,-380pt);width:100%; height:120%; margin-top: 24pt;}
+	100% {transform: translate(0pt,0pt);width:92%; height:15%; margin-left:4%;margin-right:4%;margin-top: 0pt;}
 }
 
 @keyframes fadeOut {
@@ -79,6 +79,31 @@
 }
 
 
+.selectionBar{
+  margin-left: 65pt;
+  margin-right: -65pt;
+  margin-top: -3pt;
+}
+
+.selectionBar select{
+  background-color:#fafafa;
+  border:none;
+  outline: none;
+  font-size:9px;
+  width:70%;
+  height: 130%;
+  color:#d9d9d9;
+  border-radius: 2px;
+  box-shadow: 0px 3px 7px 0px rgba(34, 23, 20, 0.35);
+  padding-left: 10px;
+  display: inline-block;
+}
+
+.selectionBar select:focus {
+    border:none;
+    -webkit-appearance: none;
+}
+
 .sidebar{
 	position: absolute;
 	height:100%;
@@ -120,6 +145,12 @@
 	animation-fill-mode: forwards;
 }
 
+#selectBar{
+  animation-duration: 0.3s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
 .sb_topImg img{
 	width:100%;
 }
@@ -158,12 +189,13 @@ canvas#hamMenu{
 }
 
 
+
 .footbar{
 	float:left;
 	position: absolute;
 	bottom:0px;
 	width:92%;
-	height:112%;
+	height:15%;
 	top:85%;
   box-shadow: 0px 3px 85px 0px rgba(90, 73, 143, 1);
 	margin-left:4%;
