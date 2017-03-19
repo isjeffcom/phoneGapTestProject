@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     <link rel="stylesheet" type="text/css" href="css/indexPage.css" />
     <link rel="stylesheet" type="text/css" href="css/timetable.css" />
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
     <title>UPBUS (alpha) - For University of Portsmouth</title>
     <style type="text/css">
 
@@ -20,8 +21,18 @@
 			src:url(./asset/font/upbusFont.ttf);
 		}
 
+    @font-face {
+        font-family: FontAwesome;
+        src: url(./asset/font/FontAwesome.otf);
+        src: local('☺'),
+           url('.//asset/font/fontawesome-webfont.woff') format('woff'),
+           url('./asset/font/fontawesome-webfont.woff2') format('woff'),
+           url('../asset/font/fontawesome-webfont.ttf') format('truetype'),
+           url('../asset/font/fontawesome-webfont.svg') format('svg');
+    }
+
     </style>
-    <script type="text/javascript" src="./js/hamMenu.js"></script>
+
   </head>
 
 
@@ -31,37 +42,259 @@
     <body>
 
     		<div class='topbar'>
-    			<canvas id="hamMenu" height="170" width="170"></canvas>
+          <a href='index.html'><i class="fa fa-angle-left topbar_left" aria-hidden="true"></i></a>
     			<div class='topbar_logo' id='logo'><a>UPBUS</a></div>
+          <div class='topbar_right'><a href='http://www.port.ac.uk/departments/services/estates/campusenvironment/transportation/intersitebus/'>More</a></div>
     		</div>
-
-
-        <div class='sidebar' id='sb'>
-          <div class='sb_topImg'>
-            <img src='./asset/img/sidebar_bg.jpg'>
-          </div>
-
-          <div class='list_cantainer'>
-            <ul>
-              <a href='#'><li>Timetable</li></a>
-              <a href='#'><li>Website</li></a>
-              <a href='#'><li>About us</li></a>
-            </ul>
-          </div>
-        </div>
-
         <div class='timetable'>
+            <div class='sLine'> </div>
 
-          <div class='t_station' id='tStation1'>
-            <div class='puple_circle'> </div>
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'> <div class='triangle' style=''> </div></div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Langstone Campus(Depart)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Langstone Campus(Depart)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Locks way Road (Milton) </a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Locks way Road (Milton) </a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Goldsmith Avenue (Lidi)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Goldsmith Avenue (Lidi)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Fratton Railway Station</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Fratton Railway Station</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Winston Churchill Ave (Ibis Hotel)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Winston Churchill Ave (Ibis Hotel)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Cambridge Road (University Library)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'>Cambridge Road (University Library)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'> <div class='triangle' style=''> </div></div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Cambridge Road (Spinnaker Sports)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Cambridge Road (Spinnaker Sports)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Winston Churchill Avenue (Law Courts)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Winston Churchill Avenue (Law Courts)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Fratton Railway Station</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Fratton Railway Station</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Goldsmith Avenue (Lidl)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Goldsmith Avenue (Lidl)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Goldsmith Avenue ( Milton Park)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Goldsmith Avenue ( Milton Park)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+            <div class='t_station'>
+              <div class='t_indicator' data-status = '1'>
+                <div class='puple_circle'>
+                  <div class='triangle' style=''> </div>
+                </div>
+              </div>
+              <div class='t_all_title'>
+                <a class='t_all_title_text'> Langstone Campus(Arrive)</a>
+              </div>
+              <div class='t_detail'>
+                <div class='t_detail_container'>
+                  <a class='t_detail_title'> Langstone Campus(Arrive)</a>
+                  <br>
+                  <a>7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40,
+                     7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40, 7:40</a>
+                </div>
+              </div>
+            </div>
+
+
+        </div>
+
+
           </div>
 
         </div>
 
 
-        <script src='./js/sidebar.js' type="text/javascript"></script>
-
-
+        <script src='./js/timetable.js'></script>
   </body>
 
 </html>

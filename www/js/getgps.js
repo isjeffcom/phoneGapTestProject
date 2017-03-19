@@ -65,8 +65,8 @@
           var minute = d.getMinutes().toString();
           hours = (minute.length == 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
           //Combine and fix to 3-4 digial number like 940, 1020 etc.
-          //currentTime = parseInt(hours+minute);
-          currentTime = 1151; // 4 debug
+          currentTime = parseInt(hours+minute);
+          //currentTime = 2046; // 4 debug
           return currentTime;
 
         }
@@ -98,7 +98,8 @@
         var stationList = document.getElementById('stationList');
         var stationListLine = document.getElementById('line');
         var fb = document.getElementById('fb');
-        var uCS = document.getElementById('selection').value; //user current station
+        var uCS = document.getElementById('selection').value; //user current station;
+
 
         //Bus basic information
         var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900, 2040, 2120, 2200, 2240]; //Bus1 Start time Each
@@ -322,8 +323,15 @@
           //Center map by click nav float Btn
           var navBtn = document.getElementById('navBtn');
           navBtn.addEventListener('click', function() {
-               map.setCenter({ lat: latitude, lng: longitude});
-               //map.setCenter({lat: 50.795058, lng: -1.095952}); //for debug
+            var tp = document.getElementById('selection').value
+
+              if(tp<=2){
+                map.setCenter({lat: locations[parseInt(tp)][1], lng: locations[parseInt(tp)][2]});
+              }else{
+                map.setCenter({lat: locations[parseInt(tp)+1][1], lng: locations[parseInt(tp)+1][2]});
+              }
+
+
           });
 
           //Bus marker set up on map
@@ -509,6 +517,7 @@
     function nextMinByUcs(uCS){
       var uCS; //User Station
       var time = currentTime;
+      uCS = document.getElementById('selection').value;
 
       for(i = 0; i<t1.length;i++){
 
