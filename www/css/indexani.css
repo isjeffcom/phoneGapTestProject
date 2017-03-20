@@ -1,0 +1,11 @@
+@keyframes indexEnter {
+  0% {transform: translate(0pt,800pt);}
+	100% {transform: translate(0pt,0pt);}
+}
+
+html{
+  animation-name:indexEnter;
+  animation-duration: 0.7s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}

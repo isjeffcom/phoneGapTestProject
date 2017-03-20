@@ -1,3 +1,5 @@
+
+
 @keyframes moveRight {
   0% {transform: translate(-160pt,0pt);}
 	50% {transform: translate(0pt,0pt);}
@@ -89,9 +91,10 @@
 
 
 .selectionBar{
-  margin-left: 65pt;
-  margin-right: -65pt;
-  margin-top: -3pt;
+  height: 22pt;
+  margin-left: 33%;
+  margin-right: -32%;
+  margin-top: -4pt;
 }
 
 .selectionBar select{

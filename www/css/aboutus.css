@@ -1,0 +1,22 @@
+@keyframes pageEnter {
+  0% {transform: translate(800pt,0pt);}
+	100% {transform: translate(0pt,0pt);}
+}
+
+html{
+  animation-name:pageEnter;
+  animation-duration: 0.7s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
+.content{
+  margin-left: 5%;
+  margin-right:5%;
+  margin-top:25%;
+}
+
+.content p{
+  font-size:16pt;
+  line-height: 24pt;
+}

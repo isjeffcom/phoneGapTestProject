@@ -29,6 +29,9 @@ html{
   overflow:hidden;
 }
 
+select{
+  -webkit-appearance: none;
+}
 
 #map {
   height: 100%;

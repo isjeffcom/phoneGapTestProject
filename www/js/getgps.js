@@ -23,19 +23,18 @@
           }
 
 
-          var latitude;
-          var longitude;
+
           // 获取位置信息成功时调用的回调函数
-          function onSuccess(position) {
+          /*function onSuccess(position) {
             var element = document.getElementById('geolocation');
-            /*element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
+            element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
                       'Longitude: '          + position.coords.longitude             + '<br />' +
                       'Altitude: '           + position.coords.altitude              + '<br />' +
                       'Accuracy: '           + position.coords.accuracy              + '<br />' +
                       'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
                       'Heading: '            + position.coords.heading               + '<br />' +
                       'Speed: '              + position.coords.speed                 + '<br />' +
-                      'Timestamp: '          + new Date(position.timestamp)          + '<br />';*/
+                      'Timestamp: '          + new Date(position.timestamp)          + '<br />';
 
             // alert('Position return successful');
 
@@ -54,7 +53,7 @@
           function onError(error) {
             alert('code: '    + error.code    + '\n' +
               'message: ' + error.message + '\n');
-          }
+          }*/
 
         var map;
 
@@ -253,13 +252,43 @@
     			  fullscreenControl: false,
                 });
 
-    			//Init marker name 设置标记名弹窗变量
+    			//Init marker pop window function
     			var infowindow = new google.maps.InfoWindow();
 
-    			//Init marker and Counter var
-    			var marker, i;
+          var userLocationImg = {
+              url: './asset/img/userlocation.png',
+              scaledSize: new google.maps.Size(20, 20),
+          };
 
-    			var stopImage = './asset/img/stopMarker.png';
+    			//Init marker and Counter var
+    			var marker, i, userLocation;
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              var latitude = position.coords.latitude;
+              var longitude = position.coords.longitude;
+              var latlng = new google.maps.LatLng(latitude, longitude);
+
+              //set up user location marker
+              userLocation = new google.maps.Marker({
+                position: latlng,
+                icon: userLocationImg,
+                map:map
+              });
+
+              //Display User Location marker
+              userLocation.setMap(map);
+
+            });
+        } else {
+          alert('You did not give me geolocation access, the location function will not work.');
+          // do nothing...
+        }
+
+    			//var stopImage = './asset/img/stopMarker.png';
+          var stopImage = {
+              url: './asset/img/stopMarker.png',
+              scaledSize: new google.maps.Size(32, 32),
+          };
 
     			//Set a loop to spawn markers 根据位置数量循环加载标记点
     			for (i = 0; i < locations.length; i++){
@@ -282,11 +311,19 @@
           //Set up Bus marker
           var bus1, bus2;
 
-          busImage = './asset/img/busMarker.png';
-          busImageInverse = './asset/img/busMarkerInv.png';
+          var busImage = {
+              url: './asset/img/busMarker.png',
+              scaledSize: new google.maps.Size(150, 150),
+          };
+
+          var busImageInverse = {
+              url: './asset/img/busMarkerInv.png',
+              scaledSize: new google.maps.Size(150, 150),
+          };
+
 
           //Get current Bus Loaction.
-          drawBus()
+          drawBus();
 
           B1img = (B1direction != 0) ? busImage : busImageInverse;
           bus1 = new google.maps.Marker({
@@ -334,9 +371,12 @@
 
           });
 
+
+
           //Bus marker set up on map
           bus1.setMap(map);
           bus2.setMap(map);
+
 
 
           //Update Bus Location
@@ -355,7 +395,7 @@
     				geodesic: true,
     				strokeColor: '#5a498f',
     				strokeOpacity:1.0,
-    				strokeWeight: 9
+    				strokeWeight: 7
     			});
 
     			marker.setMap(map);
