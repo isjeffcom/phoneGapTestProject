@@ -1003,7 +1003,7 @@
         leftCamTime = (leftCamTime != 99) ? leftCamTime : 'updating';
         leftLanTime = (leftLanTime != 99) ? leftLanTime : 'updating';
         //v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
-        k = 'To library: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
+        k = 'To library: ' + leftCamTime + 'min' + ' To Langstone: ' + leftLanTime + 'min';
         s = busStation[uCS];
         nearest.innerHTML = s;
         nextbus2.innerHTML = k;
