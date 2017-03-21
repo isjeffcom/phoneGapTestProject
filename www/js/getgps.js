@@ -824,6 +824,22 @@
       }
     }
 
+    function conTime(time){
+
+      var timeString = time.toString();
+      var timeLength = timeString.length;
+
+        if(timeLength == 4){
+          timeT = timeString[0] + timeString[1] + ":" + timeString[2] + timeString[3];
+        };
+
+        if(timeLength == 3){
+          timeT = timeString[0] + ":" + timeString[1] + timeString[2];
+        };
+
+        return timeT;
+    }
+
     function dS2update(){
       var dsNextSta = document.getElementById('ds2nextSta');
       var dStime = document.getElementsByClassName('dStime');
@@ -850,7 +866,7 @@
           B2tempTime = B2StartTime;
 
           for(i=0;i<=5;i++){
-            dStime[Math.abs(i-5)].innerHTML = B2tempTime;
+            dStime[Math.abs(i-5)].innerHTML = conTime(B2tempTime);
             B2tempTime = timeAddFix(B2tempTime + stationGap[i]);
             if(i>= 5){
               return;
@@ -871,7 +887,7 @@
               if(i-5 >= 6){
                 return;
               }
-              dStime[i-5].innerHTML = B2tempTime;
+              dStime[i-5].innerHTML = conTime(B2tempTime);
             }
           }
         }
@@ -895,7 +911,7 @@
           lineCoverT2B.style.WebkitAnimationName = 'none';
           B1tempTime = B1StartTime;
           for(i=0;i<=6;i++){
-            dStime[Math.abs(i-5)].innerHTML = B1tempTime;
+            dStime[Math.abs(i-5)].innerHTML = conTime(B1tempTime);
             B1tempTime = timeAddFix(B1tempTime + stationGap[i]);
             if(i>= 5){
               return;
@@ -913,7 +929,8 @@
               if(i-5 >= 6){
                 return;
               }
-              dStime[i-5].innerHTML = B1tempTime;
+
+              dStime[i-5].innerHTML = conTime(B1tempTime);
             }
           }
         }
@@ -965,7 +982,7 @@
 
   			bus1Status = 0;
         bus2Status = 0;
-        text = 'University Bus not in services, please check the timetable';
+        text = 'University bus not in services, please check the timetable';
         stationList.style.display = 'none';
         line.style.display = 'none';
         nextbus.innerHTML = text;
@@ -982,7 +999,7 @@
         leftCamTime = (leftCamTime != 99) ? leftCamTime : 'updating';
         leftLanTime = (leftLanTime != 99) ? leftLanTime : 'updating';
         //v = 'Bus 1 currently stop at: ' + B1stopStation + ' Next is: ' + B1nextStation + '<br>Bus 2 currently stop at: ' + B2stopStation + ' Next is: ' + B2nextStation;
-        k = 'To libray: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
+        k = 'To library: ' + leftCamTime + ' To Langstone: ' + leftLanTime;
         s = busStation[uCS];
         nearest.innerHTML = s;
         nextbus2.innerHTML = k;
