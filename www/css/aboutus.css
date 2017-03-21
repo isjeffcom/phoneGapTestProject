@@ -29,10 +29,10 @@ html{
 
 
 .github{
-  height:10%;
-  width:100%;
-  margin-top: 90%;
-
+  position: absolute;
+  height: 10%;
+  width: 100%;
+  bottom: 1%;
 }
 
 .github a{

@@ -57,7 +57,6 @@
 
         var map;
 
-
         //To get current time
         function timeRefresh(){
           var d = new Date();
