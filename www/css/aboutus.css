@@ -11,6 +11,7 @@ html{
 }
 
 .content{
+  height: 100%;
   margin-left: 5%;
   margin-right:5%;
   margin-top:25%;
@@ -19,4 +20,26 @@ html{
 .content p{
   font-size:16pt;
   line-height: 24pt;
+  color:#666;
+}
+
+.content a{
+  color:#5a498f;
+}
+
+
+.github{
+  height:10%;
+  width:100%;
+  margin-top: 90%;
+
+}
+
+.github a{
+  padding-left:22pt;
+}
+
+.github i{
+  font-size: 24pt;
+  color: #888;
 }

@@ -57,6 +57,7 @@
 
         var map;
 
+
         //To get current time
         function timeRefresh(){
           var d = new Date();
@@ -69,6 +70,11 @@
           return currentTime;
 
         }
+
+        //get weekday
+        var c = new Date();
+        var weekday = c.getDay();
+        //var weekday = 7;
 
         //NextStation and StopStation var
         var B1nextStation;
@@ -101,9 +107,19 @@
 
 
         //Bus basic information
-        var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900, 2040, 2120, 2200, 2240]; //Bus1 Start time Each
-        var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
-        var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
+        if(weekday != 6 || weekday != 7){
+          var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900, 2040, 2120, 2200, 2240]; //Bus1 Start time Each
+          var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
+          var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
+        }
+        if(weekday == 6 || weekday == 7){
+          var t1=[1000, 1040, 1120, 1200, 1320, 1400, 1440, 1520, 1620, 1700, 1740]; //Bus1 Start time Each
+          var t2=[]; //Bus2 Start time Each
+          var stationGap = [4, 4, 2, 3, 3, 4, 5, 3, 2, 3, 3]; //Bus station gap time
+        }
+
+
+
         var busStation=['Langstone Campus', 'Locks Way Road','Goldsmith Avenue', 'Fratton Railway Station', 'Winston Churchill Ave', 'Cambridge Road(Student Union)', 'Cambridge Road', 'Winston Churchill Ave', 'Fratton Railway Station', 'Goldsmith Avenue', 'Goldsmith Avenue', 'Langstone Campus'];
 
         //Set Marker's LatLng 设置标记点
@@ -387,8 +403,6 @@
           }, 3000);
 
 
-
-
     			//Draw Line 绘制路线
     			var unibusLine = new google.maps.Polyline({
     				path: lineLocations,
@@ -600,6 +614,7 @@
 
 
               var Llt = t1[i]; //Llt == start returned bus arriving time
+              var LltD = timeAddFix(t1[i+1], 20);
               var Lltx = timeMinus(t1[i+1], 20); //Lltx == start departure bus arriving time
 
                //minus and return the result to check if user still can catch the bus
