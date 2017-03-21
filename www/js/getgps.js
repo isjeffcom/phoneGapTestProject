@@ -837,6 +837,10 @@
           timeT = timeString[0] + ":" + timeString[1] + timeString[2];
         };
 
+        if(timeLength <= 2){
+          timeT = "Updating...";
+        }
+
         return timeT;
     }
 
