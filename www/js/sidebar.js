@@ -19,12 +19,10 @@ window.onload = function(){
         if(b == 0){
           sidebar.style.WebkitAnimationName = "moveLeft";
           selection.style.WebkitAnimationName = 'fadeIn';
-          canvas.style.marginLeft='-6pt';
           icon.color = "#333333";
         }else{
           sidebar.style.WebkitAnimationName = "moveRight";
           selection.style.WebkitAnimationName = 'fadeOut';
-          canvas.style.marginLeft='6pt';
           icon.color = "#ffffff";
         }
       }
@@ -37,12 +35,10 @@ window.onload = function(){
         if(b == 0){
           sidebar.style.WebkitAnimationName = "moveLeft";
           selection.style.WebkitAnimationName = 'fadeIn';
-          canvas.style.marginLeft='-6pt';
           icon.color = "#333333";
         }else{
           sidebar.style.WebkitAnimationName = "moveRight";
           selection.style.WebkitAnimationName = 'fadeOut';
-          canvas.style.marginLeft='6pt';
           icon.color = "#ffffff";
         }
     });

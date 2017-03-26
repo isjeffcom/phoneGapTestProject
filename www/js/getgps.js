@@ -65,7 +65,7 @@
           hours = (minute.length == 2) ? hours : hours * 10; //For fix, if minute is 01-09 that the minute will become 1-9 that will cause time uncountable problem
           //Combine and fix to 3-4 digial number like 940, 1020 etc.
           currentTime = parseInt(hours+minute);
-          //currentTime = 2046; // 4 debug
+          //currentTime = 1556; // 4 debug
           return currentTime;
 
         }
@@ -96,7 +96,18 @@
         var B2StartTime;
         var B1tempTime;
         var B2tempTime;
+
+        var B1exist = 1;
+        var B2exist = 1;
+        var weekdayStartTime = 740;
+        var weekdayEndTime = 2317;
+        var weekendStartTime = 800;
+        var weekendEndTime = 1816;
+        var nbStartTime = 1900;
         var ifNight = 0;
+
+
+
 
         //DOM
         var stationList = document.getElementById('stationList');
@@ -106,15 +117,21 @@
 
 
         //Bus basic information
-        if(weekday != 6 || weekday != 7){
+        if(weekday != 6 || weekday != 0){
           var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900, 2040, 2120, 2200, 2240]; //Bus1 Start time Each
           var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
           var stationGap = [3, 4, 2, 4, 2, 5, 5, 3, 2, 4, 3]; //Bus station gap time
+          var start2end = 37;
+          var serviceStartTime = weekdayStartTime;
+          var serviceEndTime = weekdayEndTime;
         }
-        if(weekday == 6 || weekday == 7){
+        if(weekday == 6 || weekday == 0){
           var t1=[1000, 1040, 1120, 1200, 1320, 1400, 1440, 1520, 1620, 1700, 1740]; //Bus1 Start time Each
           var t2=[]; //Bus2 Start time Each
           var stationGap = [4, 4, 2, 3, 3, 4, 5, 3, 2, 3, 3]; //Bus station gap time
+          var start2end = 36;
+          var serviceStartTime = weekendStartTime;
+          var serviceEndTime = weekendEndTime;
         }
 
 
@@ -357,20 +374,29 @@
             })(bus1));
 
           B2img = (B2direction != 0) ? busImage : busImageInverse;
-          bus2 = new google.maps.Marker({
-            position:(b2Location),
-            icon: B2img,
-            map:map
-          })
 
-          //Bus2 marker onClick Function
-          google.maps.event.addListener(bus2, 'click', (function(bus2) {
-            return function() {
-              content = (B2stopStation == 0) ? 'Bus 2 next station is: ' + B2nextStation : 'Bus 2 currently stop at: ' + B2stopStation + ' <br>Bus Next is: ' + B2nextStation;
-              infowindow.setContent(content);
-              infowindow.open(map, bus2);
-            }
-          })(bus2));
+
+          //Bus 2 maybe not exist
+          if(B2exist == 1){
+
+            //init bus 2 marker
+            bus2 = new google.maps.Marker({
+              position:(b2Location),
+              icon: B2img,
+              map:map
+            })
+
+            //Bus2 marker onClick Function
+            google.maps.event.addListener(bus2, 'click', (function(bus2) {
+              return function() {
+                content = (B2stopStation == 0) ? 'Bus 2 next station is: ' + B2nextStation : 'Bus 2 currently stop at: ' + B2stopStation + ' <br>Bus Next is: ' + B2nextStation;
+                infowindow.setContent(content);
+                infowindow.open(map, bus2);
+              }
+            })(bus2));
+
+          }
+
 
           //Center map by click nav float Btn
           var navBtn = document.getElementById('navBtn');
@@ -390,7 +416,11 @@
 
           //Bus marker set up on map
           bus1.setMap(map);
-          bus2.setMap(map);
+
+          if(typeof bus2 != 'undefined'){
+            bus2.setMap(map);
+          }
+
 
 
 
@@ -398,7 +428,11 @@
           setInterval(function markerBus(){
             drawBus();
             bus1.setPosition(b1Location);
-            bus2.setPosition(b2Location);
+
+            if(typeof bus2 != 'undefined'){
+              bus2.setPosition(b2Location);
+            }
+
           }, 3000);
 
 
@@ -453,7 +487,7 @@
 
   function timeAddFix(ct){
     var ct;
-    rt = ((getMin(ct) > 60) ? (ct + 100) - 60 : ct);
+    rt = ((getMin(ct) >= 60) ? (ct + 100) - 60 : ct);
     return rt;
   }
 
@@ -461,7 +495,7 @@
 
 		var prev;
 		var prevMin = getMin(prev);
-		endTime = prev + 37;
+		endTime = prev + start2end;
 		if(getMin(endTime) >= 60){
 			endTime = (endTime + 100) - 60;
 		}
@@ -498,16 +532,19 @@
 			}
 
     //BUS2
+    if(t2.length == 0){
+      B2exist = 0;
+    }
 
     for(i = 0; i<t2.length;i++){
-
       //if the time is after the final bus2 then there are no bus2 anymore
-      var lastBus2 = t2[t2.length-1]
+      var lastBus2 = t2[t2.length-1];
       if(time > toEnd(lastBus2)){
         B2stopStation = 99;
         B2nextStation = 99;
         B2direction = 0;
         B2StartTime = 0;
+
       }
 
       //if time is out of the session range that mean is bus break time
@@ -530,10 +567,9 @@
         break;
       }
 
-
     }
 
-			return [B1stopStation, B1nextStation, B2stopStation, B2nextStation, B1direction, B2direction, B1StartTime, B2StartTime];
+			return [B1stopStation, B1nextStation, B2stopStation, B2nextStation, B1direction, B2direction, B1StartTime, B2StartTime, B2exist];
 	}
     //A function for find next station by bus start time.
     function findStation(ts){
@@ -543,9 +579,15 @@
       var cS = ts; //Start Time ready to add station gap and update to Station Time
       var cT = currentTime;
 
+
       for(i=0; i<stationGap.length;i++){
         cS = timeAddFix(cS + stationGap[i]); //Station Time
         var cal = cT - cS;
+        if(cal > 0){
+          nextStation = busStation[0];
+          stopStation = busStation[0];
+          BusDirection = 0;
+        }
 
         if(cal < 0){
           nextStation = ((i == 0) ? busStation[0] : busStation[i+1]);
@@ -561,6 +603,10 @@
           BusDirection = (i <= 5) ? 0 : 1;
           break;
         }
+      }
+
+      if(typeof nextStation == 'undefined'){
+        nextStation = busStation[0];
       }
 
       return [nextStation, stopStation, BusDirection];
@@ -597,36 +643,40 @@
 
 
 
-
           //Bus1
 
           if(time > t1[i] && time < toEnd(t1[i])){ //Get Session
 
             NstationTime = t1[i]; //Get Start Time
 
-            //NightBus time
+
+            //Only one bus running
             if(typeof t2[i] == 'undefined' || t2[i] == null || t2[i] == ''){
 
+                for(c=0; c<uCS;c++){NstationTime = timeAddFix(NstationTime + stationGap[c]);} //Add to the next time the bus about to stop
 
 
-              for(c=0; c<uCS;c++){NstationTime = timeAddFix(NstationTime + stationGap[c]);} //Add to the next time the bus about to stop
+                var Llt = t1[i]; //Llt == start returned bus arriving time
+                var LltD = timeAddFix(t1[i+1], 20);
+                var Lltx = timeMinus(t1[i+1], 20); //Lltx == start departure bus arriving time
+
+                 //minus and return the result to check if user still can catch the bus
+                nUCS = 11-uCS; //Opposite same station in one round.
+
+                for(d=0; d<nUCS;d++){Llt = timeAddFix(Llt + stationGap[d]);} //Llt == calculate returned bus arriving time
+                for(e=0; e<uCS;e++){Lltx = timeAddFix(Lltx + stationGap[e]);} //Lltx == calcute departure bus arriving time
+
+                lTcal = timeMinus(NstationTime, currentTime);
+                left2CamTime = (lTcal>0) ? lTcal : timeMinus(Lltx, currentTime);
+                left2LanTime = timeMinus(Llt, currentTime);
 
 
-              var Llt = t1[i]; //Llt == start returned bus arriving time
-              var LltD = timeAddFix(t1[i+1], 20);
-              var Lltx = timeMinus(t1[i+1], 20); //Lltx == start departure bus arriving time
+                //NightBus time
+                if(currentTime>nbStartTime){
+                  ifNight = 1;
+                }
 
-               //minus and return the result to check if user still can catch the bus
-              nUCS = 11-uCS; //Opposite same station in one round.
-
-              for(d=0; d<nUCS;d++){Llt = timeAddFix(Llt + stationGap[d]);} //Llt == calculate returned bus arriving time
-              for(e=0; e<uCS;e++){Lltx = timeAddFix(Lltx + stationGap[e]);} //Lltx == calcute departure bus arriving time
-
-              lTcal = timeMinus(NstationTime, currentTime);
-              left2CamTime = (lTcal>0) ? lTcal : timeMinus(Lltx, currentTime);
-              left2LanTime = timeMinus(Llt, currentTime);
-              ifNight = 1;
-              break;
+                break;
 
             }
 
@@ -674,13 +724,61 @@
             //TEST successful
 
           }
+
+          if(time >= toEnd(t1[i]) && time <= t1[i+1]){
+
+            NstationTime = t1[i+1]; //Get Start Time
+            for(c=0; c<uCS;c++){NstationTime = timeAddFix(NstationTime + stationGap[c]);} //Add to the next time the bus about to stop
+
+
+            var Llt = t1[i+1]; //Llt == start returned bus arriving time
+            var Lltx = timeMinus(t1[i+1], 20); //Lltx == start departure bus arriving time
+
+             //minus and return the result to check if user still can catch the bus
+            nUCS = 11-uCS; //Opposite same station in one round.
+
+            for(d=0; d<nUCS;d++){Llt = timeAddFix(Llt + stationGap[d]);} //Llt == calculate returned bus arriving time
+            for(e=0; e<uCS;e++){Lltx = timeAddFix(Lltx + stationGap[e]);} //Lltx == calcute departure bus arriving time
+
+            lTcal = timeMinus(NstationTime, currentTime);
+            left2CamTime = (lTcal>0) ? lTcal : timeMinus(Lltx, currentTime);
+            left2LanTime = timeMinus(Llt, currentTime);
+
+
+            //NightBus time
+            if(currentTime>nbStartTime){
+              ifNight = 1;
+            }
+
+            break;
+          }
         }
 
       //BUS2
       for(i = 0; i<t2.length;i++){
 
+              if(time > t2[i] && time < toEnd(t2[i])){ //get session
 
-              if(time > t2[i] && time < toEnd(t2[i])){
+                //Only one bus running
+                if(t1[i+1]>=nbStartTime){
+
+                  var LltB2 = t2[i];
+                  var LltxB2 = t1[i+1];
+                  nUCSB2 = 11-uCS;
+
+                  for(d=0; d<nUCSB2;d++){LltB2 = timeAddFix(LltB2 + stationGap[d]);}
+                  for(e=0; e<uCS;e++){LltxB2 = timeAddFix(LltxB2 + stationGap[e]);}
+
+                  lTcalB2 = timeMinus(LltB2, currentTime);
+                  left2LanTimeB2 = (lTcalB2>0) ? lTcalB2 : timeMinus(LltB2, currentTime);
+                  left2CamTimeB2 = timeMinus(LltxB2, currentTime);
+
+
+                  break;
+
+                }
+
+
                 if(typeof t2[i] == 'undefined'){    //if bus is in the last session
 
                   left2CamTimeB2 = 99;
@@ -785,6 +883,7 @@
       }
 
       //Bus2
+
       if(B2stopStation == 0){
 
         for(i=0; i<busStation.length; i++){
@@ -979,9 +1078,8 @@
       var nextbus2 = document.getElementById('next2');
       var nearest = document.getElementById('nearest');
       var floatBtn = document.getElementById('floatBtn');
-
       //If out of serives time
-  		if(currentTime<740 || currentTime >= 2240){
+  		if(currentTime < serviceStartTime || currentTime >= serviceEndTime){
 
   			bus1Status = 0;
         bus2Status = 0;

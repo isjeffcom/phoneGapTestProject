@@ -80,7 +80,7 @@
 	top: 24pt;
   display: flex;
   z-index:4;
-
+  margin-left: 16pt;
 
 }
 
@@ -92,7 +92,7 @@
 
 .selectionBar{
   height: 22pt;
-  margin-left: 33%;
+  margin-left: 42%;
   margin-right: -32%;
   margin-top: -4pt;
 }

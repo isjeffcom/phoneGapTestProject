@@ -1,3 +1,9 @@
+/**
+HamMenu FROM
+Ewaryst
+https://github.com/Ewaryst/whooper-js
+**/
+
 var whooper = {
 	draw: function(c, color, frame){
 		frame = frame-(100*Math.floor(frame/100))
