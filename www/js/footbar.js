@@ -6,6 +6,7 @@ function clickHandler(){ // declare a function that updates the state
 var drawer = document.getElementById('fb');
 var dScreen1 = document.getElementById('dS1');
 var dScreen2 = document.getElementById('dS2');
+var floatBtn = document.getElementById('indicationAni');
 //var dScreen2 = document.getElementById('dS2');
 var drawerStatus = 1;
 var drawerCheck;
@@ -30,6 +31,8 @@ drawer.onclick = function drag(){
     drawer.style.WebkitAnimationName = "dUp";
     dScreen1.style.WebkitAnimationName = "fadeOut";
     dScreen2.style.WebkitAnimationName = "fadeIn";
+    floatBtn.style.WebkitAnimationName = "scale";
+
   }
 
   drawerStatus++;
