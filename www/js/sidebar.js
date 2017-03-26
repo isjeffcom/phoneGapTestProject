@@ -51,7 +51,6 @@ window.onload = function(){
       }else{
         sidebar.style.WebkitAnimationName = "moveLeft";
         selection.style.WebkitAnimationName = 'fadeIn';
-        canvas.style.marginLeft='-6pt';
         icon.color = "#333333";
         icon.rotate(200);
         }

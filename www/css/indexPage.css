@@ -75,18 +75,17 @@
 }
 
 .topbar{
-
 	position: absolute;
 	top: 24pt;
   display: flex;
   z-index:4;
-  margin-left: 16pt;
-
 }
+
 
 
 .topbar_logo{
 	z-index:2;
+
 }
 
 
@@ -196,7 +195,7 @@ canvas#hamMenu{
   height: 29px;
 	width: 29px;
   cursor: pointer;
-  margin-left: -6pt;
+  margin-left: 16pt;
 	z-index:997;
 }
 
