@@ -32,6 +32,8 @@ drawer.onclick = function drag(){
     dScreen1.style.WebkitAnimationName = "fadeOut";
     dScreen2.style.WebkitAnimationName = "fadeIn";
     floatBtn.style.WebkitAnimationName = "scale";
+    setTimeout(function(){ floatBtn.style.display = 'none';; }, 1300);
+
 
   }
 

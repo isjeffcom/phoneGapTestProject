@@ -23,38 +23,6 @@
           }
 
 
-
-          // 获取位置信息成功时调用的回调函数
-          /*function onSuccess(position) {
-            var element = document.getElementById('geolocation');
-            element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
-                      'Longitude: '          + position.coords.longitude             + '<br />' +
-                      'Altitude: '           + position.coords.altitude              + '<br />' +
-                      'Accuracy: '           + position.coords.accuracy              + '<br />' +
-                      'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
-                      'Heading: '            + position.coords.heading               + '<br />' +
-                      'Speed: '              + position.coords.speed                 + '<br />' +
-                      'Timestamp: '          + new Date(position.timestamp)          + '<br />';
-
-            // alert('Position return successful');
-
-            var latitude = position.coords.latitude;
-            var longitude = position.coords.longitude;
-
-
-
-            //    Google Maps API set center:
-            map.setCenter({ lat: latitude, lng: longitude});
-            return [latitude, longitude];
-
-          }
-
-          // onError回调函数接收一个PositionError对象
-          function onError(error) {
-            alert('code: '    + error.code    + '\n' +
-              'message: ' + error.message + '\n');
-          }*/
-
         var map;
 
         //To get current time
@@ -107,8 +75,6 @@
         var ifNight = 0;
 
 
-
-
         //DOM
         var stationList = document.getElementById('stationList');
         var stationListLine = document.getElementById('line');
@@ -116,7 +82,7 @@
         var uCS = document.getElementById('selection').value; //user current station;
 
 
-        //Bus basic information
+        //Bus basic information, set timetable by weekday or weekend
         if(weekday != 6 || weekday != 0){
           var t1=[740, 820, 900, 940, 1020, 1100, 1140, 1220, 1300, 1340, 1420, 1500, 1540, 1620, 1700, 1740, 1820, 1900, 2040, 2120, 2200, 2240]; //Bus1 Start time Each
           var t2=[800, 840, 920, 1000, 1040, 1120, 1200, 1240, 1320, 1400, 1440, 1520, 1600, 1640, 1720, 1800, 1840]; //Bus2 Start time Each
@@ -138,7 +104,7 @@
 
         var busStation=['Langstone Campus', 'Locks Way Road','Goldsmith Avenue', 'Fratton Railway Station', 'Winston Churchill Ave', 'Cambridge Road(Student Union)', 'Cambridge Road', 'Winston Churchill Ave', 'Fratton Railway Station', 'Goldsmith Avenue', 'Goldsmith Avenue', 'Langstone Campus'];
 
-        //Set Marker's LatLng 设置标记点
+        //Set Marker's location latlng
         var locations = [
           ['Langstone Campus', 50.796784, -1.041907, 4],
           ['Locksway Road', 50.793440, -1.056964,4],
@@ -574,7 +540,7 @@
     //A function for find next station by bus start time.
     function findStation(ts){
 
-      //ts = t[i] ts为起驶时间 ts is the start time
+      //ts = t[i] var  ts is the start time
       var ts;
       var cS = ts; //Start Time ready to add station gap and update to Station Time
       var cT = currentTime;
@@ -1069,7 +1035,7 @@
     });
 
 
-    //Main Excutive funcion, Main controller
+    //Main Executive funcion, Main controller
     function main(){
       uCS = document.getElementById('selection').value;
 
@@ -1105,12 +1071,4 @@
         nearest.innerHTML = s;
         nextbus2.innerHTML = k;
     }
-  }
-
-
-
-
-
-  function footBar(){
-
   }
